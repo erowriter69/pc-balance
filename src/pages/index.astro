@@ -1,11 +1,5790 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import cpus from "../data/cpus.json";
+import gpus from "../data/gpus.json";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const title = "CPU & GPU Bottleneck Calculator";
+const description =
+  "Estimate whether your CPU and GPU are a balanced match for gaming, streaming, editing, and everyday PC use.";
+
+const getNumber = (value = "") => {
+  const match = value.match(/\d+/);
+  return match ? Number(match[0]) : 0;
+};
+
+const cpuTier = (name = "") => {
+  const ryzen = name.match(/Ryzen\s+(\d+)/i);
+  if (ryzen) return Number(ryzen[1]);
+
+  const intel = name.match(/Core\s+i(\d)/i);
+  if (intel) return Number(intel[1]);
+
+  const ultra = name.match(/Core\s+Ultra\s+(\d)/i);
+  if (ultra) return Number(ultra[1]);
+
+  return 0;
+};
+
+const cpuModelNumber = (name = "") => {
+  const matches = name.match(/\d{4,5}/g);
+  return matches ? Number(matches[matches.length - 1]) : getNumber(name);
+};
+
+const gpuModelNumber = (name = "") => {
+  const match = name.match(/(\d{3,4})/);
+  return match ? Number(match[1]) : 0;
+};
+
+const gpuSuffixRank = (name = "") => {
+  const n = name.toLowerCase();
+  if (n.includes("ti super")) return 5;
+  if (n.includes("super")) return 4;
+  if (n.includes(" ti")) return 3;
+  if (n.includes("xtx")) return 5;
+  if (n.includes(" xt")) return 3;
+  return 1;
+};
+
+const sortedCpus = [...cpus].sort((a, b) => {
+  if (a.brand !== b.brand) {
+    const brandOrder = { AMD: 0, Intel: 1 };
+    return (brandOrder[a.brand] ?? 99) - (brandOrder[b.brand] ?? 99);
+  }
+
+  const tierDiff = cpuTier(a.name) - cpuTier(b.name);
+  if (tierDiff !== 0) return tierDiff;
+
+  const modelDiff = cpuModelNumber(a.name) - cpuModelNumber(b.name);
+  if (modelDiff !== 0) return modelDiff;
+
+  return a.name.localeCompare(b.name);
+});
+
+const sortedGpus = [...gpus].sort((a, b) => {
+  if (a.brand !== b.brand) {
+    const brandOrder = { NVIDIA: 0, AMD: 1, Intel: 2 };
+    return (brandOrder[a.brand] ?? 99) - (brandOrder[b.brand] ?? 99);
+  }
+
+  const modelDiff = gpuModelNumber(a.name) - gpuModelNumber(b.name);
+  if (modelDiff !== 0) return modelDiff;
+
+  return gpuSuffixRank(a.name) - gpuSuffixRank(b.name);
+});
+
+const popularCpuIds = new Set([
+  "ryzen-5-5600",
+  "ryzen-7-7800x3d",
+  "ryzen-7-9800x3d",
+  "ryzen-9-9950x3d",
+  "core-ultra-7-270k-plus",
+  "i7-14700k",
+]);
+
+const popularGpuIds = new Set([
+  "rtx-3060",
+  "rtx-4060",
+  "rtx-5070",
+  "rtx-5080",
+  "rx-9070-xt",
+  "arc-b580",
+]);
+
+const popularCpus = sortedCpus.filter((cpu) => popularCpuIds.has(cpu.id));
+const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/">
+            <span class="brand-icon">⚡</span>
+            <span>PC Balance</span>
+          </a>
+
+          <nav class="nav">
+            <a href="#calculator">Calculator</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="hero-glow hero-glow-one"></div>
+          <div class="hero-glow hero-glow-two"></div>
+
+          <div class="hero-inner">
+            <div class="hero-copy">
+              <span class="eyebrow">PC PERFORMANCE TOOL</span>
+
+              <h1>
+                CPU & GPU
+                <span>Bottleneck Calculator</span>
+              </h1>
+
+              <p class="hero-text">
+                Find out whether your processor and graphics card are a balanced
+                match for your resolution and workload.
+              </p>
+
+              <div class="hero-points">
+                <div class="hero-point">
+                  <span class="point-icon">✓</span>
+                  <span>Fast hardware comparison</span>
+                </div>
+
+                <div class="hero-point">
+                  <span class="point-icon">✓</span>
+                  <span>Resolution-aware analysis</span>
+                </div>
+
+                <div class="hero-point">
+                  <span class="point-icon">✓</span>
+                  <span>Clear upgrade guidance</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hardware-visual" aria-hidden="true">
+              <div class="visual-card cpu-card">
+                <span class="visual-label">CPU</span>
+                <div class="chip">
+                  <div class="chip-core"></div>
+                  <span>PROCESSOR</span>
+                </div>
+              </div>
+
+              <div class="connection">
+                <span class="connection-line"></span>
+
+                <div class="gauge">
+                  <div class="gauge-number">92%</div>
+                  <span>Balanced</span>
+                </div>
+
+                <span class="connection-line"></span>
+              </div>
+
+              <div class="visual-card gpu-card">
+                <span class="visual-label">GPU</span>
+
+                <div class="gpu">
+                  <div class="gpu-fans">
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <div class="gpu-detail"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="calculator-section" id="calculator">
+          <div class="section-heading">
+            <span class="section-kicker">CHECK YOUR BUILD</span>
+            <h2>Calculate Your PC Bottleneck</h2>
+            <p>
+              Filter by brand, choose your main components, and tell us how you plan to use your computer.
+            </p>
+          </div>
+
+          <div class="calculator-card">
+            <div class="pro-controls">
+              <div class="hardware-picker-block">
+                <div class="picker-topline">
+                  <div>
+                    <span class="picker-kicker">PROCESSOR</span>
+                    <h3>Choose your CPU</h3>
+                  </div>
+
+                  <div class="brand-segments" data-brand-group="cpu">
+                    <button type="button" class="brand-chip active" data-brand="">All</button>
+                    <button type="button" class="brand-chip" data-brand="AMD">AMD</button>
+                    <button type="button" class="brand-chip" data-brand="Intel">Intel</button>
+                  </div>
+                </div>
+
+                <select id="cpuBrand" class="native-control" aria-hidden="true" tabindex="-1">
+                  <option value="">All CPU brands</option>
+                  <option value="AMD">AMD</option>
+                  <option value="Intel">Intel</option>
+                </select>
+
+                <select id="cpu" class="native-control" aria-hidden="true" tabindex="-1">
+                  <option value="">Select your CPU</option>
+                  {
+                    sortedCpus.map((cpu) => (
+                      <option
+                        value={cpu.id}
+                        data-brand={cpu.brand}
+                        data-score={cpu.score}
+                        data-gaming={cpu.gamingScore}
+                        data-gaming-index={cpu.gamingBenchmarkIndex}
+                        data-pairing-index={cpu.pairingIndex}
+                        data-pairing-status={cpu.pairingIndexStatus}
+                        data-data-quality={cpu.dataQuality}
+                        data-benchmark-status={cpu.gamingBenchmarkStatus}
+                        data-productivity={cpu.productivityScore}
+                        data-single={cpu.singleCoreScore}
+                        data-multi={cpu.multiCoreScore}
+                        data-architecture={cpu.architecture}
+                        data-cores={cpu.cores}
+                        data-threads={cpu.threads}
+                        data-year={cpu.releaseYear}
+                      >
+                        {cpu.brand} {cpu.name}
+                      </option>
+                    ))
+                  }
+                </select>
+
+                <div class="smart-select" data-picker="cpu">
+                  <button type="button" class="smart-trigger" aria-expanded="false">
+                    <span>
+                      <small>Selected processor</small>
+                      <strong id="cpuTriggerText">Select your CPU</strong>
+                    </span>
+                    <span class="trigger-arrow">⌄</span>
+                  </button>
+
+                  <div class="smart-panel" hidden>
+                    <div class="smart-search-wrap">
+                      <span class="search-icon">⌕</span>
+                      <input
+                        id="cpuSearch"
+                        class="smart-search"
+                        type="search"
+                        placeholder="Search Ryzen, Core i5, 7800X3D..."
+                        autocomplete="off"
+                      />
+                    </div>
+
+                    <div class="smart-options" id="cpuOptions">
+                      <div class="option-section" data-popular-section>
+                        <div class="option-section-title">Popular CPUs</div>
+                        {
+                          popularCpus.map((cpu) => (
+                            <button
+                              type="button"
+                              class="smart-option popular-option"
+                              data-value={cpu.id}
+                              data-brand={cpu.brand}
+                              data-search={`${cpu.brand} ${cpu.name} ${cpu.architecture}`.toLowerCase()}
+                            >
+                              <span class="option-main">
+                                <span class="option-brand">{cpu.brand}</span>
+                                <strong>{cpu.name}</strong>
+                                <small>
+                                  {cpu.architecture} · {cpu.cores} cores / {cpu.threads} threads · Released {cpu.releaseYear}
+                                </small>
+                              </span>
+                              <span class="popular-tag">Popular</span>
+                            </button>
+                          ))
+                        }
+                      </div>
+
+                      <div class="option-section">
+                        <div class="option-section-title">All CPUs</div>
+                        {
+                          sortedCpus.map((cpu) => (
+                            <button
+                              type="button"
+                              class="smart-option"
+                              data-value={cpu.id}
+                              data-brand={cpu.brand}
+                              data-search={`${cpu.brand} ${cpu.name} ${cpu.architecture}`.toLowerCase()}
+                            >
+                              <span class="option-main">
+                                <span class="option-brand">{cpu.brand}</span>
+                                <strong>{cpu.name}</strong>
+                                <small>
+                                  {cpu.architecture} · {cpu.cores} cores / {cpu.threads} threads · Released {cpu.releaseYear}
+                                </small>
+                              </span>
+                            </button>
+                          ))
+                        }
+                      </div>
+                    </div>
+
+                    <p class="no-results" id="cpuNoResults" hidden>No matching processors found.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hardware-picker-block">
+                <div class="picker-topline">
+                  <div>
+                    <span class="picker-kicker">GRAPHICS CARD</span>
+                    <h3>Choose your GPU</h3>
+                  </div>
+
+                  <div class="brand-segments" data-brand-group="gpu">
+                    <button type="button" class="brand-chip active" data-brand="">All</button>
+                    <button type="button" class="brand-chip" data-brand="NVIDIA">NVIDIA</button>
+                    <button type="button" class="brand-chip" data-brand="AMD">AMD Radeon</button>
+                    <button type="button" class="brand-chip" data-brand="Intel">Intel Arc</button>
+                  </div>
+                </div>
+
+                <select id="gpuBrand" class="native-control" aria-hidden="true" tabindex="-1">
+                  <option value="">All GPU brands</option>
+                  <option value="NVIDIA">NVIDIA</option>
+                  <option value="AMD">AMD Radeon</option>
+                  <option value="Intel">Intel Arc</option>
+                </select>
+
+                <select id="gpu" class="native-control" aria-hidden="true" tabindex="-1">
+                  <option value="">Select your GPU</option>
+                  {
+                    sortedGpus.map((gpu) => (
+                      <option
+                        value={gpu.id}
+                        data-brand={gpu.brand}
+                        data-score={gpu.score}
+                        data-gaming={gpu.gamingScore}
+                        data-fps1080={gpu.rasterFps1080}
+                        data-fps1440={gpu.rasterFps1440}
+                        data-fps4k={gpu.rasterFps4k}
+                        data-pairing-index={gpu.pairingIndex}
+                        data-pairing-status={gpu.pairingIndexStatus}
+                        data-data-quality={gpu.dataQuality}
+                        data-benchmark-status={gpu.rasterBenchmarkStatus}
+                        data-render={gpu.renderScore}
+                        data-rt={gpu.rayTracingScore}
+                        data-architecture={gpu.architecture}
+                        data-vram={gpu.vramGB}
+                        data-year={gpu.releaseYear}
+                      >
+                        {gpu.brand} {gpu.name}
+                      </option>
+                    ))
+                  }
+                </select>
+
+                <div class="smart-select" data-picker="gpu">
+                  <button type="button" class="smart-trigger" aria-expanded="false">
+                    <span>
+                      <small>Selected graphics card</small>
+                      <strong id="gpuTriggerText">Select your GPU</strong>
+                    </span>
+                    <span class="trigger-arrow">⌄</span>
+                  </button>
+
+                  <div class="smart-panel" hidden>
+                    <div class="smart-search-wrap">
+                      <span class="search-icon">⌕</span>
+                      <input
+                        id="gpuSearch"
+                        class="smart-search"
+                        type="search"
+                        placeholder="Search RTX 4070, RX 7800 XT..."
+                        autocomplete="off"
+                      />
+                    </div>
+
+                    <div class="smart-options" id="gpuOptions">
+                      <div class="option-section" data-popular-section>
+                        <div class="option-section-title">Popular GPUs</div>
+                        {
+                          popularGpus.map((gpu) => (
+                            <button
+                              type="button"
+                              class="smart-option popular-option"
+                              data-value={gpu.id}
+                              data-brand={gpu.brand}
+                              data-search={`${gpu.brand} ${gpu.name} ${gpu.architecture}`.toLowerCase()}
+                            >
+                              <span class="option-main">
+                                <span class="option-brand">{gpu.brand}</span>
+                                <strong>{gpu.name}</strong>
+                                <small>
+                                  {gpu.architecture} · {gpu.vramGB} GB VRAM · Released {gpu.releaseYear}
+                                </small>
+                              </span>
+                              <span class="popular-tag">Popular</span>
+                            </button>
+                          ))
+                        }
+                      </div>
+
+                      <div class="option-section">
+                        <div class="option-section-title">All GPUs</div>
+                        {
+                          sortedGpus.map((gpu) => (
+                            <button
+                              type="button"
+                              class="smart-option"
+                              data-value={gpu.id}
+                              data-brand={gpu.brand}
+                              data-search={`${gpu.brand} ${gpu.name} ${gpu.architecture}`.toLowerCase()}
+                            >
+                              <span class="option-main">
+                                <span class="option-brand">{gpu.brand}</span>
+                                <strong>{gpu.name}</strong>
+                                <small>
+                                  {gpu.architecture} · {gpu.vramGB} GB VRAM · Released {gpu.releaseYear}
+                                </small>
+                              </span>
+                            </button>
+                          ))
+                        }
+                      </div>
+                    </div>
+
+                    <p class="no-results" id="gpuNoResults" hidden>No matching graphics cards found.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="choice-panel">
+                <div class="choice-heading">
+                  <span class="picker-kicker">RESOLUTION</span>
+                  <h3>Choose your display resolution</h3>
+                </div>
+
+                <select id="resolution" class="native-control" aria-hidden="true" tabindex="-1">
+                  <option value="1080p">1920 × 1080 — 1080p</option>
+                  <option value="1440p">2560 × 1440 — 1440p</option>
+                  <option value="4k">3840 × 2160 — 4K</option>
+                </select>
+
+                <div class="visual-choices resolution-choices" data-control="resolution">
+                  <button type="button" class="visual-choice active" data-value="1080p">
+                    <strong>1080p</strong>
+                    <span>1920 × 1080</span>
+                  </button>
+                  <button type="button" class="visual-choice" data-value="1440p">
+                    <strong>1440p</strong>
+                    <span>2560 × 1440</span>
+                  </button>
+                  <button type="button" class="visual-choice" data-value="4k">
+                    <strong>4K</strong>
+                    <span>3840 × 2160</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="choice-panel">
+                <div class="choice-heading">
+                  <span class="picker-kicker">PRIMARY USE</span>
+                  <h3>Choose your main workload</h3>
+                </div>
+
+                <select id="purpose" class="native-control" aria-hidden="true" tabindex="-1">
+                  <option value="gaming">Gaming</option>
+                  <option value="streaming">Gaming & Streaming</option>
+                  <option value="editing">Video Editing</option>
+                  <option value="productivity">Productivity</option>
+                </select>
+
+                <div class="visual-choices purpose-choices" data-control="purpose">
+                  <button type="button" class="visual-choice active" data-value="gaming">
+                    <span class="choice-icon">G</span>
+                    <strong>Gaming</strong>
+                    <span>FPS & graphics</span>
+                  </button>
+                  <button type="button" class="visual-choice" data-value="streaming">
+                    <span class="choice-icon">S</span>
+                    <strong>Gaming + Stream</strong>
+                    <span>Play and broadcast</span>
+                  </button>
+                  <button type="button" class="visual-choice" data-value="editing">
+                    <span class="choice-icon">E</span>
+                    <strong>Video Editing</strong>
+                    <span>Render & timeline</span>
+                  </button>
+                  <button type="button" class="visual-choice" data-value="productivity">
+                    <span class="choice-icon">P</span>
+                    <strong>Productivity</strong>
+                    <span>Work & multitask</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="compact-choice-row">
+                <div class="compact-choice-panel">
+                  <div class="compact-title">
+                    <span>RAM</span>
+                    <small>Optional</small>
+                  </div>
+
+                  <select id="ram" class="native-control" aria-hidden="true" tabindex="-1">
+                    <option value="">Not selected</option>
+                    <option value="8">8 GB</option>
+                    <option value="16">16 GB</option>
+                    <option value="32">32 GB</option>
+                    <option value="64">64 GB</option>
+                    <option value="128">128 GB+</option>
+                  </select>
+
+                  <div class="chip-choices" data-control="ram">
+                    <button type="button" class="select-chip active" data-value="">Auto</button>
+                    <button type="button" class="select-chip" data-value="8">8 GB</button>
+                    <button type="button" class="select-chip" data-value="16">16 GB</button>
+                    <button type="button" class="select-chip" data-value="32">32 GB</button>
+                    <button type="button" class="select-chip" data-value="64">64 GB</button>
+                    <button type="button" class="select-chip" data-value="128">128+</button>
+                  </div>
+                </div>
+
+                <div class="compact-choice-panel">
+                  <div class="compact-title">
+                    <span>Target FPS</span>
+                    <small>Optional</small>
+                  </div>
+
+                  <select id="fps" class="native-control" aria-hidden="true" tabindex="-1">
+                    <option value="">Not selected</option>
+                    <option value="60">60 FPS</option>
+                    <option value="75">75 FPS</option>
+                    <option value="120">120 FPS</option>
+                    <option value="144">144 FPS</option>
+                    <option value="165">165 FPS</option>
+                    <option value="240">240 FPS</option>
+                  </select>
+
+                  <div class="chip-choices" data-control="fps">
+                    <button type="button" class="select-chip active" data-value="">Auto</button>
+                    <button type="button" class="select-chip" data-value="60">60</button>
+                    <button type="button" class="select-chip" data-value="75">75</button>
+                    <button type="button" class="select-chip" data-value="120">120</button>
+                    <button type="button" class="select-chip" data-value="144">144</button>
+                    <button type="button" class="select-chip" data-value="165">165</button>
+                    <button type="button" class="select-chip" data-value="240">240</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hardware-profile-grid">
+              <article class="hardware-profile" id="cpuProfile">
+                <div class="profile-heading">
+                  <span class="profile-icon">CPU</span>
+                  <div>
+                    <small>PROCESSOR PROFILE</small>
+                    <h3 id="cpuProfileName">Select a CPU</h3>
+                  </div>
+                </div>
+
+                <div class="profile-specs">
+                  <div>
+                    <span>Architecture</span>
+                    <strong id="cpuArchitecture">—</strong>
+                  </div>
+                  <div>
+                    <span>Cores / Threads</span>
+                    <strong id="cpuCoresThreads">—</strong>
+                  </div>
+                  <div>
+                    <span>Released</span>
+                    <strong id="cpuYear">—</strong>
+                  </div>
+                  <div>
+                    <span>Gaming Profile</span>
+                    <strong id="cpuGamingProfile">—</strong>
+                  </div>
+                  <div>
+                    <span>Productivity Profile</span>
+                    <strong id="cpuProductivityProfile">—</strong>
+                  </div>
+                  <div>
+                    <span>Single-Core Profile</span>
+                    <strong id="cpuSingleProfile">—</strong>
+                  </div>
+                </div>
+              </article>
+
+              <article class="hardware-profile" id="gpuProfile">
+                <div class="profile-heading">
+                  <span class="profile-icon">GPU</span>
+                  <div>
+                    <small>GRAPHICS CARD PROFILE</small>
+                    <h3 id="gpuProfileName">Select a GPU</h3>
+                  </div>
+                </div>
+
+                <div class="profile-specs">
+                  <div>
+                    <span>Architecture</span>
+                    <strong id="gpuArchitecture">—</strong>
+                  </div>
+                  <div>
+                    <span>VRAM</span>
+                    <strong id="gpuVram">—</strong>
+                  </div>
+                  <div>
+                    <span>Released</span>
+                    <strong id="gpuYear">—</strong>
+                  </div>
+                  <div>
+                    <span>Gaming Profile</span>
+                    <strong id="gpuGamingProfile">—</strong>
+                  </div>
+                  <div>
+                    <span>Rendering Profile</span>
+                    <strong id="gpuRenderProfile">—</strong>
+                  </div>
+                  <div>
+                    <span>Ray Tracing Profile</span>
+                    <strong id="gpuRtProfile">—</strong>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <div class="calculate-area">
+              <button class="calculate-button" type="button">
+                <span>Calculate Bottleneck</span>
+                <span class="button-arrow">→</span>
+              </button>
+
+              <p>
+                Results are estimates and may vary by game, software, settings,
+                cooling, and system configuration.
+              </p>
+            </div>
+          </div>
+
+          <div class="result-card" id="resultCard" aria-live="polite">
+            <div class="result-topline">
+              <div>
+                <span class="result-label">YOUR RESULT</span>
+                <h3 id="resultTitle">Ready to calculate</h3>
+                <p class="result-pair" id="resultPair">
+                  Select your CPU and GPU to analyse this build.
+                </p>
+              </div>
+
+              <div class="result-top-actions">
+                <button class="new-calculation-button" id="newCalculationButton" type="button">
+                  New calculation
+                </button>
+
+                <div class="match-badge" id="matchBadge">
+                  <strong id="matchScore">--</strong>
+                  <span>Build Score</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-main">
+              <div class="bottleneck-meter">
+                <div class="meter-ring" id="meterRing">
+                  <div class="meter-inner">
+                    <strong id="resultPercentage">0%</strong>
+                    <span>Estimated</span>
+                  </div>
+                </div>
+
+                <div class="meter-copy">
+                  <span class="meter-kicker">LIKELY LIMIT</span>
+                  <h4 id="resultType">No bottleneck calculated yet</h4>
+                  <p id="resultText">
+                    Select your hardware and click Calculate Bottleneck.
+                  </p>
+                  <p class="estimate-range" id="resultRange">
+                    Expected range: —
+                  </p>
+                </div>
+              </div>
+
+              <div class="result-stats">
+                <div class="result-stat">
+                  <span>Overall Match</span>
+                  <strong id="overallMatch">—</strong>
+                </div>
+
+                <div class="result-stat">
+                  <span>Selected Resolution</span>
+                  <strong id="resultResolution">—</strong>
+                </div>
+
+                <div class="result-stat">
+                  <span>Workload</span>
+                  <strong id="resultPurpose">—</strong>
+                </div>
+
+                <div class="result-stat">
+                  <span>Estimate Confidence</span>
+                  <strong id="resultConfidence">—</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="recommendation-box">
+              <div class="recommendation-icon">↗</div>
+
+              <div>
+                <span>UPGRADE GUIDANCE</span>
+                <p id="upgradeText">
+                  Your upgrade recommendation will appear here.
+                </p>
+              </div>
+            </div>
+
+            <div class="experience-grid">
+              <div class="experience-item">
+                <span class="experience-dot"></span>
+                <div>
+                  <small>EXPECTED EXPERIENCE</small>
+                  <strong id="experienceText">—</strong>
+                </div>
+              </div>
+
+              <div class="experience-item">
+                <span class="experience-dot"></span>
+                <div>
+                  <small>RAM CHECK</small>
+                  <strong id="ramText">Not selected</strong>
+                </div>
+              </div>
+
+              <div class="experience-item">
+                <span class="experience-dot"></span>
+                <div>
+                  <small>FPS TARGET</small>
+                  <strong id="fpsText">Not selected</strong>
+                </div>
+              </div>
+            </div>
+
+            <section class="build-report" id="buildReport">
+              <div class="report-heading">
+                <div>
+                  <span class="result-label">BUILD REPORT</span>
+                  <h4>Your System at a Glance</h4>
+                </div>
+                <span class="report-grade" id="reportGrade">—</span>
+              </div>
+
+              <div class="performance-bars">
+                <div class="performance-bar">
+                  <div class="bar-top">
+                    <span>CPU workload strength</span>
+                    <strong id="cpuBarValue">0</strong>
+                  </div>
+                  <div class="bar-track"><span id="cpuBar"></span></div>
+                </div>
+
+                <div class="performance-bar">
+                  <div class="bar-top">
+                    <span>GPU workload strength</span>
+                    <strong id="gpuBarValue">0</strong>
+                  </div>
+                  <div class="bar-track"><span id="gpuBar"></span></div>
+                </div>
+              </div>
+
+              <div class="report-rating-grid">
+                <div class="report-rating">
+                  <span>Gaming</span>
+                  <strong id="gamingRating">—</strong>
+                </div>
+                <div class="report-rating">
+                  <span>Streaming</span>
+                  <strong id="streamingRating">—</strong>
+                </div>
+                <div class="report-rating">
+                  <span>Video Editing</span>
+                  <strong id="editingRating">—</strong>
+                </div>
+                <div class="report-rating">
+                  <span>Ray Tracing</span>
+                  <strong id="rayTracingRating">—</strong>
+                </div>
+              </div>
+
+              <div class="report-summary-grid">
+                <div class="report-summary-card">
+                  <span>WHAT THIS BUILD DOES WELL</span>
+                  <p id="reportStrengths">—</p>
+                </div>
+
+                <div class="report-summary-card">
+                  <span>WHAT TO WATCH</span>
+                  <p id="reportWatch">—</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="resolution-report" id="resolution-summary">
+              <div class="decision-heading">
+                <div>
+                  <span class="result-label">RESOLUTION SUMMARY</span>
+                  <h4>How This Pairing Changes by Resolution</h4>
+                </div>
+              </div>
+
+              <div class="resolution-result-grid">
+                <article class="resolution-result-card" id="resolution1080Card">
+                  <div class="resolution-card-top">
+                    <div>
+                      <span>1080p</span>
+                      <strong>1920 × 1080</strong>
+                    </div>
+                    <span class="resolution-status" id="resolution1080Status">—</span>
+                  </div>
+                  <p id="resolution1080Text">—</p>
+                  <div class="resolution-meta">
+                    <span id="resolution1080Percent">—</span>
+                    <span id="resolution1080Limit">—</span>
+                  </div>
+                </article>
+
+                <article class="resolution-result-card" id="resolution1440Card">
+                  <div class="resolution-card-top">
+                    <div>
+                      <span>1440p</span>
+                      <strong>2560 × 1440</strong>
+                    </div>
+                    <span class="resolution-status" id="resolution1440Status">—</span>
+                  </div>
+                  <p id="resolution1440Text">—</p>
+                  <div class="resolution-meta">
+                    <span id="resolution1440Percent">—</span>
+                    <span id="resolution1440Limit">—</span>
+                  </div>
+                </article>
+
+                <article class="resolution-result-card" id="resolution4kCard">
+                  <div class="resolution-card-top">
+                    <div>
+                      <span>4K</span>
+                      <strong>3840 × 2160</strong>
+                    </div>
+                    <span class="resolution-status" id="resolution4kStatus">—</span>
+                  </div>
+                  <p id="resolution4kText">—</p>
+                  <div class="resolution-meta">
+                    <span id="resolution4kPercent">—</span>
+                    <span id="resolution4kLimit">—</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="action-report">
+              <div class="decision-heading">
+                <div>
+                  <span class="result-label">WHAT YOU CAN DO</span>
+                  <h4>Practical Recommendations for This Build</h4>
+                </div>
+              </div>
+
+              <div class="action-list" id="actionList"></div>
+            </section>
+
+            <section class="recommendation-report" id="upgrade-options">
+              <div class="decision-heading recommendation-heading">
+                <div>
+                  <span class="result-label">RECOMMENDED UPGRADES</span>
+                  <h4 id="recommendedUpgradeTitle">Best Next-Step Options</h4>
+                </div>
+                <p id="recommendedUpgradeIntro">
+                  Upgrade suggestions will appear after calculation.
+                </p>
+              </div>
+
+              <div class="upgrade-card-grid" id="upgradeCardGrid"></div>
+            </section>
+
+            <section class="ram-report" id="memory-guidance">
+              <div class="decision-heading">
+                <div>
+                  <span class="result-label">MEMORY GUIDANCE</span>
+                  <h4>Recommended RAM for Your Workload</h4>
+                </div>
+              </div>
+
+              <div class="ram-recommendation-grid">
+                <article class="ram-recommendation-card">
+                  <span>MINIMUM</span>
+                  <strong id="ramMinimum">—</strong>
+                  <p id="ramMinimumText">—</p>
+                </article>
+
+                <article class="ram-recommendation-card featured">
+                  <span>RECOMMENDED</span>
+                  <strong id="ramRecommended">—</strong>
+                  <p id="ramRecommendedText">—</p>
+                </article>
+
+                <article class="ram-recommendation-card">
+                  <span>HEAVY USE</span>
+                  <strong id="ramHeavy">—</strong>
+                  <p id="ramHeavyText">—</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="shopping-report" id="shop">
+              <div class="decision-heading shopping-heading">
+                <div>
+                  <span class="result-label">BUY OR COMPARE PARTS</span>
+                  <h4>Search Retailers for This Build</h4>
+                </div>
+                <p>
+                  These are normal retailer search links, not live prices. Availability varies by region.
+                </p>
+              </div>
+
+              <div class="shopping-grid">
+                <article class="shopping-card">
+                  <span class="shopping-type">CPU</span>
+                  <strong id="shoppingCpuName">Selected CPU</strong>
+                  <div class="retailer-links">
+                    <a id="cpuAmazonLink" href="#" target="_blank" rel="noopener noreferrer">Search Amazon ↗</a>
+                    <a id="cpuNeweggLink" href="#" target="_blank" rel="noopener noreferrer">Search Newegg ↗</a>
+                  </div>
+                </article>
+
+                <article class="shopping-card">
+                  <span class="shopping-type">GPU</span>
+                  <strong id="shoppingGpuName">Selected GPU</strong>
+                  <div class="retailer-links">
+                    <a id="gpuAmazonLink" href="#" target="_blank" rel="noopener noreferrer">Search Amazon ↗</a>
+                    <a id="gpuNeweggLink" href="#" target="_blank" rel="noopener noreferrer">Search Newegg ↗</a>
+                  </div>
+                </article>
+
+                <article class="shopping-card">
+                  <span class="shopping-type">RAM</span>
+                  <strong id="shoppingRamName">Recommended memory</strong>
+                  <div class="retailer-links">
+                    <a id="ramAmazonLink" href="#" target="_blank" rel="noopener noreferrer">Search Amazon ↗</a>
+                    <a id="ramNeweggLink" href="#" target="_blank" rel="noopener noreferrer">Search Newegg ↗</a>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="method-card" id="methodCard">
+              <div class="method-heading">
+                <div>
+                  <span class="result-label">HOW THIS ESTIMATE WAS CALCULATED</span>
+                  <h4>Transparent Pairing Analysis</h4>
+                </div>
+                <span class="method-status">Gaming Engine v3.1</span>
+              </div>
+
+              <div class="method-grid">
+                <div class="method-item">
+                  <span>CPU relative strength</span>
+                  <strong id="methodCpuScore">—</strong>
+                </div>
+
+                <div class="method-item">
+                  <span>GPU relative strength</span>
+                  <strong id="methodGpuScore">—</strong>
+                </div>
+
+                <div class="method-item">
+                  <span>Resolution effect</span>
+                  <strong id="methodResolution">—</strong>
+                </div>
+
+                <div class="method-item">
+                  <span>Workload weighting</span>
+                  <strong id="methodWorkload">—</strong>
+                </div>
+
+                <div class="method-item">
+                  <span>FPS adjustment</span>
+                  <strong id="methodFps">—</strong>
+                </div>
+
+                <div class="method-item">
+                  <span>RAM adjustment</span>
+                  <strong id="methodRam">—</strong>
+                </div>
+              </div>
+
+              <div class="confidence-explainer">
+                <div class="confidence-title">
+                  <span>ESTIMATE CONFIDENCE</span>
+                  <strong id="confidenceSummary">—</strong>
+                </div>
+
+                <div class="confidence-points" id="confidencePoints"></div>
+              </div>
+
+              <p class="method-note">
+                Gaming Engine v2 combines benchmark-calibrated CPU/GPU pairing indices with
+                the selected GPU's native 1080p, 1440p, and 4K raster scaling. A calibrated
+                nonlinear curve improves mild GPU-limited estimates without inflating severe
+                mismatches, while the dead zone filters benchmark noise. The result remains a
+                comparative estimate rather than a universal per-game utilization measurement.
+              </p>
+            </section>
+
+            <p class="result-disclaimer">
+              This is a comparative estimate, not a direct benchmark of your
+              individual PC. Games, settings, drivers, cooling, and background
+              software can change real-world performance.
+            </p>
+          </div>
+        </section>
+
+        <section class="info-section">
+          <div class="section-heading">
+            <span class="section-kicker">WHY IT MATTERS</span>
+            <h2>A Balanced PC Gives You More From Your Hardware</h2>
+            <p>
+              A bottleneck happens when one component cannot keep up with
+              another, limiting the performance your system can deliver.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div class="feature-icon">CPU</div>
+
+              <h3>CPU Bottleneck</h3>
+
+              <p>
+                Your processor may struggle to prepare frames or handle game
+                logic quickly enough for the graphics card.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">GPU</div>
+
+              <h3>GPU Bottleneck</h3>
+
+              <p>
+                Your graphics card may be the limiting component, especially at
+                higher resolutions and demanding visual settings.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">✓</div>
+
+              <h3>Balanced Build</h3>
+
+              <p>
+                A well-balanced system allows both major components to work
+                efficiently without a significant mismatch.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="how-section" id="how-it-works">
+          <div class="how-card">
+            <div class="how-copy">
+              <span class="section-kicker">HOW IT WORKS</span>
+              <h2>Simple Inputs. Clear Results.</h2>
+
+              <p>
+                Our calculator will compare the relative performance of your CPU
+                and GPU while considering resolution and the type of work you
+                want your PC to perform.
+              </p>
+            </div>
+
+            <div class="steps">
+              <div class="step">
+                <span>01</span>
+
+                <div>
+                  <h3>Select Your Hardware</h3>
+                  <p>Choose your processor and graphics card.</p>
+                </div>
+              </div>
+
+              <div class="step">
+                <span>02</span>
+
+                <div>
+                  <h3>Choose Your Usage</h3>
+                  <p>Select your resolution and main workload.</p>
+                </div>
+              </div>
+
+              <div class="step">
+                <span>03</span>
+
+                <div>
+                  <h3>Review Your Result</h3>
+                  <p>
+                    See the likely bottleneck and which component matters most.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="faq-section" id="faq">
+          <div class="section-heading">
+            <span class="section-kicker">COMMON QUESTIONS</span>
+            <h2>Frequently Asked Questions</h2>
+          </div>
+
+          <div class="faq-list">
+            <details>
+              <summary>What is a CPU and GPU bottleneck?</summary>
+              <p>
+                A bottleneck occurs when one component limits how much
+                performance another component can deliver. In many games, the
+                CPU and GPU can become the limiting component under different
+                conditions.
+              </p>
+            </details>
+
+            <details>
+              <summary>Is a small bottleneck bad?</summary>
+              <p>
+                Not necessarily. Every computer has a limiting component at some
+                point. Small differences between CPU and GPU performance are
+                normal.
+              </p>
+            </details>
+
+            <details>
+              <summary>Does resolution affect bottlenecks?</summary>
+              <p>
+                Yes. Lower resolutions can place more emphasis on CPU
+                performance, while higher resolutions usually increase the
+                workload placed on the graphics card.
+              </p>
+            </details>
+
+            <details>
+              <summary>Are bottleneck percentages exact?</summary>
+              <p>
+                No. They are estimates. Actual performance can change between
+                games, applications, settings, drivers, cooling, and other
+                hardware.
+              </p>
+            </details>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-shell">
+          <div class="footer-primary">
+            <div class="footer-about">
+              <a class="brand footer-brand" href="/">
+                <span class="brand-icon">⚡</span>
+                <span>PC Balance</span>
+              </a>
+
+              <h3>Build a better-balanced PC.</h3>
+
+              <p>
+                PC Balance helps you compare processor and graphics-card strength,
+                understand likely bottlenecks, and make more informed upgrade
+                decisions for gaming and everyday workloads.
+              </p>
+
+              <div class="footer-stats">
+                <div>
+                  <strong>{cpus.length}</strong>
+                  <span>Processors</span>
+                </div>
+                <div>
+                  <strong>{gpus.length}</strong>
+                  <span>Graphics cards</span>
+                </div>
+                <div>
+                  <strong>3</strong>
+                  <span>Resolutions analysed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="footer-column">
+              <h4>Calculator</h4>
+              <a href="#calculator">Bottleneck Calculator</a>
+              <a href="#buildReport">System at a Glance</a>
+              <a href="#resolution-summary">Resolution Analysis</a>
+              <a href="#upgrade-options">Upgrade Recommendations</a>
+              <a href="#memory-guidance">RAM Guidance</a>
+            </div>
+
+            <div class="footer-column">
+              <h4>PC Balance</h4>
+              <a href="#how-it-works">How It Works</a>
+              <a href="#faq">Frequently Asked Questions</a>
+              <a href="#methodCard">Calculation Method</a>
+              <a href="#shop">Buy or Compare Parts</a>
+
+              <div class="footer-coming-soon">
+                <span>More tools</span>
+                <p>CPU comparison, GPU comparison, FPS and PSU tools are planned.</p>
+              </div>
+            </div>
+
+            <div class="footer-column">
+              <h4>Shopping & Disclosure</h4>
+              <p class="footer-column-copy">
+                Retailer buttons currently open normal product searches. PC Balance
+                does not display live prices or claim retailer availability.
+              </p>
+              <a href="#shop">Search Parts</a>
+              <a href="#faq">Calculator Disclaimer</a>
+
+              <div class="footer-disclosure">
+                <span>Affiliate-ready</span>
+                <p>
+                  If affiliate links are introduced later, qualifying links will
+                  be clearly disclosed here and near the relevant recommendations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-secondary">
+            <div>
+              <strong>PC Balance</strong>
+              <span>CPU & GPU decision-support tools</span>
+            </div>
+
+            <p>
+              Estimates are comparative and can vary by game, application,
+              settings, drivers, cooling, memory configuration, and hardware.
+            </p>
+
+            <span class="copyright">
+              © {new Date().getFullYear()} PC Balance
+            </span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  :global(*) {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
+  :global(body) {
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.5;
+  }
+
+  :global(button),
+  :global(select) {
+    font: inherit;
+  }
+
+  :global(a) {
+    color: inherit;
+  }
+
+  .page-shell {
+    min-height: 100vh;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1), transparent 34%),
+      linear-gradient(180deg, #07101f 0%, #091322 100%);
+  }
+
+  .site-header {
+    position: relative;
+    z-index: 20;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(7, 16, 31, 0.8);
+    backdrop-filter: blur(18px);
+  }
+
+  .header-inner {
+    width: min(1180px, 92%);
+    height: 76px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-size: 1.08rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid rgba(93, 162, 255, 0.32);
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.16);
+    color: #78aaff;
+    font-size: 1rem;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav a {
+    color: #9eadc2;
+    text-decoration: none;
+    font-size: 0.94rem;
+    font-weight: 600;
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .nav a:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .hero {
+    position: relative;
+    min-height: 640px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+    pointer-events: none;
+  }
+
+  .hero-glow {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  .hero-glow-one {
+    width: 420px;
+    height: 420px;
+    top: 30px;
+    left: -190px;
+    background: rgba(37, 99, 235, 0.17);
+  }
+
+  .hero-glow-two {
+    width: 380px;
+    height: 380px;
+    right: -150px;
+    bottom: -80px;
+    background: rgba(23, 171, 196, 0.1);
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    width: min(1180px, 92%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.02fr 0.98fr;
+    gap: 80px;
+    align-items: center;
+    padding: 85px 0;
+  }
+
+  .eyebrow,
+  .section-kicker {
+    display: inline-block;
+    color: #6fa6ff;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+  }
+
+  .hero h1 {
+    margin-top: 18px;
+    max-width: 720px;
+    font-size: clamp(3rem, 5.8vw, 5.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+  }
+
+  .hero h1 span {
+    display: block;
+    margin-top: 8px;
+    color: #6ca5ff;
+  }
+
+  .hero-text {
+    max-width: 650px;
+    margin-top: 27px;
+    color: #9eadc2;
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    line-height: 1.75;
+  }
+
+  .hero-points {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 26px;
+  }
+
+  .hero-point {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #c4cfdd;
+    font-size: 0.91rem;
+    font-weight: 600;
+  }
+
+  .point-icon {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.18);
+    color: #77aaff;
+    font-size: 0.7rem;
+  }
+
+  .hardware-visual {
+    position: relative;
+    min-height: 390px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 18px;
+    align-items: center;
+    padding: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 28px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+    box-shadow:
+      0 30px 80px rgba(0, 0, 0, 0.28),
+      inset 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  .hardware-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at center,
+      rgba(37, 99, 235, 0.11),
+      transparent 55%
+    );
+    pointer-events: none;
+  }
+
+  .visual-card {
+    position: relative;
+    z-index: 2;
+    min-height: 240px;
+    padding: 17px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    background: rgba(4, 10, 20, 0.72);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+  }
+
+  .visual-label {
+    position: absolute;
+    top: 15px;
+    left: 16px;
+    color: #7d8da3;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+  }
+
+  .chip {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    border: 8px solid #25344c;
+    border-radius: 16px;
+    background: #101d31;
+    box-shadow:
+      0 0 0 2px #33435b,
+      0 0 35px rgba(37, 99, 235, 0.16);
+  }
+
+  .chip::before,
+  .chip::after {
+    content: "";
+    position: absolute;
+    inset: -18px 13px;
+    border-top: 5px dotted #394c68;
+    border-bottom: 5px dotted #394c68;
+  }
+
+  .chip::after {
+    inset: 13px -18px;
+    border: 0;
+    border-left: 5px dotted #394c68;
+    border-right: 5px dotted #394c68;
+  }
+
+  .chip-core {
+    position: absolute;
+    width: 58px;
+    height: 58px;
+    border: 1px solid #426395;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #203b64, #13243e);
+  }
+
+  .chip span {
+    position: relative;
+    z-index: 2;
+    font-size: 0.54rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    color: #8db8ff;
+  }
+
+  .connection {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+  }
+
+  .connection-line {
+    width: 24px;
+    height: 2px;
+    background: linear-gradient(90deg, #234b88, #4f8de8);
+  }
+
+  .gauge {
+    width: 88px;
+    height: 88px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    border: 6px solid rgba(67, 122, 207, 0.3);
+    border-top-color: #659cf2;
+    border-right-color: #659cf2;
+    border-radius: 50%;
+    background: #091426;
+    box-shadow: 0 0 32px rgba(53, 111, 201, 0.22);
+  }
+
+  .gauge-number {
+    color: #f6f9ff;
+    font-size: 1.08rem;
+    font-weight: 900;
+  }
+
+  .gauge span {
+    margin-top: 1px;
+    color: #70e0b1;
+    font-size: 0.58rem;
+    font-weight: 700;
+  }
+
+  .gpu {
+    width: 155px;
+    height: 100px;
+    position: relative;
+    border: 2px solid #334966;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #182a43, #0c1727);
+    box-shadow: 0 0 35px rgba(37, 99, 235, 0.13);
+  }
+
+  .gpu::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 70px;
+    left: -10px;
+    top: 14px;
+    border-radius: 4px 0 0 4px;
+    background: #344965;
+  }
+
+  .gpu-fans {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .gpu-fans span {
+    width: 48px;
+    height: 48px;
+    border: 7px solid #344b6b;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 5px #12233a;
+  }
+
+  .gpu-detail {
+    position: absolute;
+    width: 54px;
+    height: 5px;
+    left: 49px;
+    bottom: -8px;
+    border-radius: 2px;
+    background: #8b6e28;
+  }
+
+  .calculator-section,
+  .info-section,
+  .how-section,
+  .faq-section {
+    width: min(1180px, 92%);
+    margin: 0 auto;
+    padding: 105px 0;
+  }
+
+  .section-heading {
+    max-width: 740px;
+    margin: 0 auto 46px;
+    text-align: center;
+  }
+
+  .section-heading h2,
+  .how-copy h2 {
+    margin-top: 12px;
+    color: #f7f9fd;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+
+  .section-heading p,
+  .how-copy p {
+    margin-top: 16px;
+    color: #8fa0b6;
+    line-height: 1.75;
+  }
+
+  .calculator-card {
+    padding: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.085);
+    border-radius: 26px;
+    background: rgba(13, 27, 48, 0.8);
+    box-shadow:
+      0 25px 70px rgba(0, 0, 0, 0.26),
+      inset 0 1px rgba(255, 255, 255, 0.035);
+  }
+
+  .calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  label {
+    color: #ccd5e2;
+    font-size: 0.87rem;
+    font-weight: 700;
+  }
+
+  .optional {
+    margin-left: 5px;
+    color: #64758c;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  select {
+    width: 100%;
+    height: 54px;
+    padding: 0 15px;
+    appearance: auto;
+    border: 1px solid rgba(145, 165, 192, 0.22);
+    border-radius: 11px;
+    outline: none;
+    background: #0a1729;
+    color: #e8edf5;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  select:focus {
+    border-color: #4c83db;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  }
+
+  .native-control {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .pro-controls {
+    display: grid;
+    gap: 20px;
+  }
+
+  .hardware-picker-block,
+  .choice-panel,
+  .compact-choice-panel {
+    position: relative;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 17px;
+    background: rgba(7, 18, 33, 0.5);
+  }
+
+  .hardware-picker-block {
+    z-index: 1;
+  }
+
+  .hardware-picker-block.open-picker {
+    z-index: 5000;
+  }
+
+  .smart-select.open {
+    z-index: 6000;
+  }
+
+  .picker-topline,
+  .choice-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+
+  .picker-kicker {
+    color: #6fa6ff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+  }
+
+  .picker-topline h3,
+  .choice-heading h3 {
+    margin-top: 4px;
+    color: #edf3fb;
+    font-size: 1rem;
+  }
+
+  .brand-segments {
+    display: flex;
+    gap: 7px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 11px;
+    background: rgba(3, 10, 20, 0.46);
+  }
+
+  .brand-chip,
+  .select-chip {
+    border: 0;
+    cursor: pointer;
+    color: #7f91a9;
+    background: transparent;
+    font-weight: 750;
+    transition: 0.18s ease;
+  }
+
+  .brand-chip {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+  }
+
+  .brand-chip:hover,
+  .select-chip:hover {
+    color: #dce7f6;
+  }
+
+  .brand-chip.active,
+  .select-chip.active {
+    color: #fff;
+    background: rgba(49, 111, 218, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(100, 158, 248, 0.3);
+  }
+
+  .smart-select {
+    position: relative;
+    z-index: 12;
+  }
+
+  .smart-trigger {
+    width: 100%;
+    min-height: 66px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border: 1px solid rgba(133, 157, 190, 0.22);
+    border-radius: 13px;
+    background: #0a1729;
+    color: #ecf2fa;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.18s ease;
+  }
+
+  .smart-trigger:hover,
+  .smart-trigger[aria-expanded="true"] {
+    border-color: #4f83d3;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  }
+
+  .smart-trigger small {
+    display: block;
+    color: #62758e;
+    font-size: 0.66rem;
+    font-weight: 700;
+  }
+
+  .smart-trigger strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.95rem;
+  }
+
+  .trigger-arrow {
+    color: #74a8f9;
+    font-size: 1.35rem;
+    transition: transform 0.18s ease;
+  }
+
+  .smart-trigger[aria-expanded="true"] .trigger-arrow {
+    transform: rotate(180deg);
+  }
+
+  .smart-panel {
+    position: absolute;
+    z-index: 7000;
+    top: calc(100% + 9px);
+    left: 0;
+    right: 0;
+    max-height: 420px;
+    overflow: hidden;
+    border: 1px solid rgba(100, 151, 229, 0.22);
+    border-radius: 16px;
+    background: #0a1526;
+    box-shadow: 0 28px 65px rgba(0, 0, 0, 0.5);
+    transform-origin: top center;
+  }
+
+  .smart-select.open .smart-panel {
+    animation: smartPanelIn 0.18s ease both;
+  }
+
+  @keyframes smartPanelIn {
+    from {
+      opacity: 0;
+      transform: translateY(-7px) scale(0.992);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .smart-search-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    padding: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 27px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6584ad;
+  }
+
+  .smart-search {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px 0 39px;
+    border: 1px solid rgba(139, 165, 199, 0.17);
+    border-radius: 10px;
+    outline: none;
+    background: #071321;
+    color: #edf3fb;
+  }
+
+  .smart-search:focus {
+    border-color: #4e86dc;
+  }
+
+  .smart-options {
+    max-height: 330px;
+    overflow-y: auto;
+    padding: 7px;
+  }
+
+  .smart-option {
+    width: 100%;
+    padding: 12px 13px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #dce5f1;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .smart-option:hover,
+  .smart-option.selected {
+    background: rgba(55, 112, 208, 0.14);
+  }
+
+  .smart-option[hidden] {
+    display: none;
+  }
+
+  .option-main {
+    min-width: 0;
+  }
+
+  .option-brand {
+    display: inline-block;
+    margin-bottom: 4px;
+    color: #679cf0;
+    font-size: 0.61rem;
+    font-weight: 900;
+    letter-spacing: 0.09em;
+  }
+
+  .option-main strong,
+  .option-main small {
+    display: block;
+  }
+
+  .option-main strong {
+    font-size: 0.88rem;
+  }
+
+  .option-main small {
+    margin-top: 3px;
+    color: #687b93;
+    font-size: 0.69rem;
+  }
+
+  .option-section + .option-section {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .option-section-title {
+    padding: 7px 13px 6px;
+    color: #607692;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .popular-option {
+    background: rgba(37, 99, 235, 0.035);
+  }
+
+  .popular-tag {
+    flex: 0 0 auto;
+    align-self: center;
+    padding: 5px 8px;
+    border: 1px solid rgba(102, 160, 250, 0.18);
+    border-radius: 7px;
+    background: rgba(37, 99, 235, 0.08);
+    color: #78aaff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .no-results {
+    padding: 24px;
+    color: #778ba5;
+    text-align: center;
+    font-size: 0.82rem;
+  }
+
+  .visual-choices {
+    display: grid;
+    gap: 10px;
+  }
+
+  .resolution-choices {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .purpose-choices {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .visual-choice {
+    min-height: 76px;
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(133, 157, 190, 0.13);
+    border-radius: 12px;
+    background: rgba(5, 14, 27, 0.5);
+    color: #7f91a8;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.18s ease;
+  }
+
+  .visual-choice:hover {
+    border-color: rgba(94, 147, 231, 0.36);
+  }
+
+  .visual-choice.active {
+    border-color: #477dce;
+    background: rgba(42, 95, 185, 0.14);
+    box-shadow: inset 0 0 0 1px rgba(89, 145, 232, 0.12);
+  }
+
+  .visual-choice strong {
+    color: #dce5f1;
+    font-size: 0.85rem;
+  }
+
+  .visual-choice > span:last-child {
+    margin-top: 3px;
+    font-size: 0.67rem;
+  }
+
+  .choice-icon {
+    width: 27px;
+    height: 27px;
+    margin-bottom: 8px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.12);
+    color: #6da5ff;
+    font-size: 0.67rem;
+    font-weight: 900;
+  }
+
+  .compact-choice-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .compact-title {
+    margin-bottom: 13px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #cbd6e4;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  .compact-title small {
+    color: #596d86;
+    font-size: 0.65rem;
+  }
+
+  .chip-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .select-chip {
+    min-width: 56px;
+    padding: 9px 11px;
+    border-radius: 9px;
+    background: rgba(4, 13, 25, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(139, 165, 199, 0.11);
+    font-size: 0.75rem;
+  }
+
+  .result-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .new-calculation-button {
+    min-height: 42px;
+    padding: 0 15px;
+    border: 1px solid rgba(129, 158, 198, 0.17);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.025);
+    color: #9fb0c5;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 750;
+    transition: 0.18s ease;
+  }
+
+  .new-calculation-button:hover {
+    border-color: rgba(100, 158, 248, 0.34);
+    color: #edf4ff;
+    background: rgba(37, 99, 235, 0.07);
+  }
+
+  .resolution-report,
+  .action-report,
+  .recommendation-report,
+  .ram-report,
+  .shopping-report {
+    margin-top: 22px;
+    padding: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 18px;
+    background: rgba(4, 14, 26, 0.34);
+  }
+
+  .decision-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 22px;
+    margin-bottom: 20px;
+  }
+
+  .decision-heading h4 {
+    margin-top: 5px;
+    color: #edf3fb;
+    font-size: 1.15rem;
+  }
+
+  .recommendation-heading > p,
+  .shopping-heading > p {
+    max-width: 440px;
+    color: #6f8299;
+    text-align: right;
+    font-size: 0.72rem;
+    line-height: 1.55;
+  }
+
+  .resolution-result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .resolution-result-card {
+    padding: 17px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .resolution-result-card.selected-resolution {
+    border-color: rgba(82, 140, 229, 0.36);
+    background: rgba(37, 99, 235, 0.07);
+  }
+
+  .resolution-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .resolution-card-top > div > span {
+    display: block;
+    color: #6fa6ff;
+    font-size: 0.7rem;
+    font-weight: 900;
+  }
+
+  .resolution-card-top > div > strong {
+    display: block;
+    margin-top: 3px;
+    color: #cbd6e4;
+    font-size: 0.78rem;
+  }
+
+  .resolution-status {
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.09);
+    color: #7faeff;
+    font-size: 0.62rem;
+    font-weight: 850;
+  }
+
+  .resolution-result-card p {
+    min-height: 58px;
+    margin-top: 14px;
+    color: #8194ab;
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
+  .resolution-meta {
+    margin-top: 13px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 11px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: #60758e;
+    font-size: 0.66rem;
+    font-weight: 750;
+  }
+
+  .action-list {
+    display: grid;
+    gap: 9px;
+  }
+
+  .action-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 13px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.015);
+  }
+
+  .action-icon {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.11);
+    color: #76a9ff;
+    font-size: 0.68rem;
+    font-weight: 900;
+  }
+
+  .action-item strong {
+    display: block;
+    color: #d3deeb;
+    font-size: 0.8rem;
+  }
+
+  .action-item p {
+    margin-top: 3px;
+    color: #74889f;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .upgrade-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .upgrade-card {
+    padding: 18px;
+    border: 1px solid rgba(79, 139, 230, 0.13);
+    border-radius: 13px;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.07), transparent 40%),
+      rgba(255, 255, 255, 0.016);
+  }
+
+  .upgrade-card-placeholder {
+    grid-column: 1 / -1;
+    padding: 24px;
+    border: 1px dashed rgba(121, 147, 183, 0.15);
+    border-radius: 13px;
+    color: #71849c;
+    text-align: center;
+    font-size: 0.78rem;
+  }
+
+  .upgrade-card-kicker {
+    color: #6499ec;
+    font-size: 0.61rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  .upgrade-card h5 {
+    margin-top: 6px;
+    color: #e4ebf5;
+    font-size: 0.95rem;
+  }
+
+  .upgrade-improvement {
+    margin-top: 10px;
+    color: #89b6fb;
+    font-size: 0.8rem;
+    font-weight: 850;
+  }
+
+  .upgrade-card p {
+    margin-top: 8px;
+    color: #75889f;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .upgrade-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .upgrade-actions a {
+    padding: 7px 9px;
+    border: 1px solid rgba(99, 155, 241, 0.17);
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.06);
+    color: #86b4fa;
+    text-decoration: none;
+    font-size: 0.66rem;
+    font-weight: 750;
+  }
+
+  .upgrade-actions a:hover {
+    border-color: rgba(99, 155, 241, 0.34);
+    background: rgba(37, 99, 235, 0.11);
+  }
+
+  .ram-recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .ram-recommendation-card {
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.016);
+  }
+
+  .ram-recommendation-card.featured {
+    border-color: rgba(89, 145, 232, 0.3);
+    background: rgba(37, 99, 235, 0.07);
+  }
+
+  .ram-recommendation-card > span {
+    color: #617892;
+    font-size: 0.61rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  .ram-recommendation-card > strong {
+    display: block;
+    margin-top: 8px;
+    color: #edf3fb;
+    font-size: 1.35rem;
+  }
+
+  .ram-recommendation-card p {
+    margin-top: 7px;
+    color: #788ca4;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .shopping-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .shopping-card {
+    padding: 17px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.016);
+  }
+
+  .shopping-type {
+    color: #6499ec;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  .shopping-card > strong {
+    display: block;
+    min-height: 40px;
+    margin-top: 7px;
+    color: #dce5f1;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .retailer-links {
+    margin-top: 13px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .retailer-links a {
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.08);
+    color: #83b1f8;
+    text-decoration: none;
+    font-size: 0.65rem;
+    font-weight: 750;
+  }
+
+  .retailer-links a:hover {
+    background: rgba(37, 99, 235, 0.14);
+  }
+
+  .build-report {
+    margin-top: 22px;
+    padding: 28px;
+    border: 1px solid rgba(87, 145, 235, 0.16);
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 38%),
+      rgba(4, 14, 26, 0.42);
+  }
+
+  .report-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 23px;
+  }
+
+  .report-heading h4 {
+    margin-top: 5px;
+    color: #edf3fb;
+    font-size: 1.25rem;
+  }
+
+  .report-grade {
+    padding: 8px 12px;
+    border: 1px solid rgba(99, 155, 241, 0.24);
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.09);
+    color: #7babf8;
+    font-weight: 900;
+  }
+
+  .performance-bars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .bar-top {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    color: #8395ad;
+    font-size: 0.75rem;
+  }
+
+  .bar-top strong {
+    color: #cbd8e8;
+  }
+
+  .bar-track {
+    height: 9px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.065);
+  }
+
+  .bar-track span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #315fba, #68a2ff);
+    transition: width 0.45s ease;
+  }
+
+  .report-rating-grid {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .report-rating {
+    padding: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .report-rating span {
+    color: #657991;
+    font-size: 0.66rem;
+  }
+
+  .report-rating strong {
+    display: block;
+    margin-top: 4px;
+    color: #d4deeb;
+    font-size: 0.82rem;
+  }
+
+  .report-summary-grid {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .report-summary-card {
+    padding: 17px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 12px;
+  }
+
+  .report-summary-card span,
+  .upgrade-suggestions > div:first-child span {
+    color: #679cf0;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  .report-summary-card p {
+    margin-top: 7px;
+    color: #8fa0b6;
+    line-height: 1.6;
+    font-size: 0.8rem;
+  }
+
+  .upgrade-suggestions {
+    margin-top: 16px;
+    padding: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border: 1px solid rgba(75, 133, 221, 0.14);
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.045);
+  }
+
+  .upgrade-suggestions h5 {
+    margin-top: 4px;
+    color: #dce6f3;
+    font-size: 0.9rem;
+  }
+
+  .upgrade-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+
+  .upgrade-pill {
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.12);
+    color: #89b5fa;
+    font-size: 0.68rem;
+    font-weight: 750;
+  }
+
+  .hardware-profile-grid {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .hardware-profile {
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 17px;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(45, 103, 201, 0.08), transparent 38%),
+      rgba(7, 18, 33, 0.58);
+  }
+
+  .profile-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .profile-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(92, 148, 235, 0.28);
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.11);
+    color: #78aaff;
+    font-size: 0.68rem;
+    font-weight: 900;
+  }
+
+  .profile-heading small {
+    display: block;
+    color: #61748d;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.11em;
+  }
+
+  .profile-heading h3 {
+    margin-top: 3px;
+    color: #eaf0f8;
+    font-size: 1rem;
+  }
+
+  .profile-specs {
+    margin-top: 17px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .profile-specs > div {
+    min-height: 68px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .profile-specs span {
+    color: #60738b;
+    font-size: 0.64rem;
+    font-weight: 700;
+  }
+
+  .profile-specs strong {
+    margin-top: 4px;
+    color: #cbd5e2;
+    font-size: 0.82rem;
+  }
+
+  .calculate-area {
+    margin-top: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .calculate-button {
+    min-width: 275px;
+    min-height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2d67c9, #356fda);
+    color: #fff;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 12px 32px rgba(37, 99, 235, 0.25);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .calculate-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 35px rgba(37, 99, 235, 0.32);
+  }
+
+  .button-arrow {
+    font-size: 1.15rem;
+  }
+
+  .calculate-area p {
+    max-width: 630px;
+    margin-top: 15px;
+    color: #687b93;
+    text-align: center;
+    font-size: 0.77rem;
+    line-height: 1.6;
+  }
+
+  .result-card {
+    display: none;
+    margin-top: 28px;
+    padding: 34px;
+    border: 1px solid rgba(110, 163, 247, 0.18);
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at 92% 8%, rgba(58, 111, 207, 0.12), transparent 32%),
+      rgba(11, 24, 43, 0.96);
+    box-shadow:
+      0 28px 80px rgba(0, 0, 0, 0.28),
+      inset 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  .result-card.show {
+    display: block;
+    animation: resultReveal 0.45s ease both;
+  }
+
+  @keyframes resultReveal {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .result-topline {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .result-label,
+  .meter-kicker,
+  .recommendation-box span {
+    color: #6fa6ff;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+  }
+
+  .result-card h3 {
+    margin-top: 8px;
+    color: #f6f8fc;
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+    letter-spacing: -0.035em;
+  }
+
+  .result-pair {
+    margin-top: 8px;
+    color: #8395ad;
+    font-size: 0.9rem;
+  }
+
+  .match-badge {
+    min-width: 118px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(95, 151, 239, 0.24);
+    border-radius: 16px;
+    background: rgba(37, 99, 235, 0.08);
+  }
+
+  .match-badge strong {
+    color: #79aaff;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  .match-badge span {
+    margin-top: 6px;
+    color: #8295ad;
+    font-size: 0.66rem;
+    font-weight: 700;
+  }
+
+  .result-main {
+    display: grid;
+    grid-template-columns: 1.4fr 0.6fr;
+    gap: 28px;
+    padding: 30px 0;
+  }
+
+  .bottleneck-meter {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+
+  .meter-ring {
+    --meter-angle: 0deg;
+    width: 138px;
+    height: 138px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, #0b182b 57%, transparent 58%),
+      conic-gradient(#5f96ee var(--meter-angle), rgba(107, 130, 162, 0.15) 0);
+    box-shadow: 0 0 36px rgba(48, 103, 190, 0.12);
+  }
+
+  .meter-inner {
+    width: 106px;
+    height: 106px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 50%;
+    background: #091426;
+  }
+
+  .meter-inner strong {
+    color: #f7f9fc;
+    font-size: 2.15rem;
+    line-height: 1;
+  }
+
+  .meter-inner span {
+    margin-top: 5px;
+    color: #71849d;
+    font-size: 0.66rem;
+    font-weight: 700;
+  }
+
+  .meter-copy h4 {
+    margin-top: 8px;
+    color: #eef3fa;
+    font-size: 1.25rem;
+  }
+
+  .meter-copy p {
+    max-width: 590px;
+    margin-top: 10px;
+    color: #8fa0b6;
+    line-height: 1.7;
+    font-size: 0.9rem;
+  }
+
+  .meter-copy .estimate-range {
+    margin-top: 12px;
+    color: #78a9ff;
+    font-size: 0.82rem;
+    font-weight: 750;
+    letter-spacing: 0.01em;
+  }
+
+  .result-stats {
+    display: grid;
+    gap: 10px;
+  }
+
+  .result-stat {
+    min-height: 74px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .result-stat span {
+    color: #6f8198;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .result-stat strong {
+    margin-top: 4px;
+    color: #dce5f1;
+    font-size: 0.92rem;
+  }
+
+  .recommendation-box {
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: flex-start;
+    border: 1px solid rgba(76, 132, 218, 0.16);
+    border-radius: 15px;
+    background: rgba(37, 99, 235, 0.055);
+  }
+
+  .recommendation-icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.14);
+    color: #76a9ff;
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .recommendation-box p {
+    margin-top: 5px;
+    color: #a1afc1;
+    line-height: 1.55;
+    font-size: 0.82rem;
+  }
+
+  .experience-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .experience-item {
+    padding: 15px 16px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 11px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .experience-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #5f96ee;
+    box-shadow: 0 0 13px rgba(95, 150, 238, 0.5);
+  }
+
+  .experience-item small {
+    display: block;
+    color: #61748d;
+    font-size: 0.61rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .experience-item strong {
+    display: block;
+    margin-top: 3px;
+    color: #cbd5e2;
+    font-size: 0.82rem;
+  }
+
+  .method-card {
+    margin-top: 18px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    background: rgba(4, 13, 25, 0.38);
+  }
+
+  .method-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .method-heading h4 {
+    margin-top: 5px;
+    color: #edf3fb;
+    font-size: 1.08rem;
+  }
+
+  .method-status {
+    padding: 7px 10px;
+    border: 1px solid rgba(99, 155, 241, 0.2);
+    border-radius: 9px;
+    background: rgba(37, 99, 235, 0.07);
+    color: #7eaff9;
+    font-size: 0.66rem;
+    font-weight: 800;
+  }
+
+  .method-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .method-item {
+    padding: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .method-item span {
+    display: block;
+    color: #657991;
+    font-size: 0.65rem;
+  }
+
+  .method-item strong {
+    display: block;
+    margin-top: 4px;
+    color: #d5deea;
+    font-size: 0.8rem;
+  }
+
+  .confidence-explainer {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid rgba(69, 126, 214, 0.12);
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.035);
+  }
+
+  .confidence-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .confidence-title span {
+    color: #679cf0;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  .confidence-title strong {
+    color: #dce6f3;
+    font-size: 0.78rem;
+  }
+
+  .confidence-points {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 12px;
+  }
+
+  .confidence-point {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    color: #8193aa;
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
+
+  .confidence-point::before {
+    content: "✓";
+    color: #6fa6ff;
+    font-weight: 900;
+  }
+
+  .confidence-point.warning::before {
+    content: "•";
+    color: #7a8ea8;
+  }
+
+  .method-note {
+    margin-top: 15px;
+    color: #5e728b;
+    font-size: 0.69rem;
+    line-height: 1.55;
+  }
+
+  .result-disclaimer {
+    max-width: 820px;
+    margin: 20px auto 0;
+    color: #596d86;
+    text-align: center;
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .info-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .feature-card {
+    min-height: 250px;
+    padding: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(89, 143, 226, 0.3);
+    border-radius: 13px;
+    background: rgba(37, 99, 235, 0.11);
+    color: #76a9ff;
+    font-size: 0.73rem;
+    font-weight: 900;
+  }
+
+  .feature-card h3 {
+    margin-top: 25px;
+    color: #f4f7fb;
+    font-size: 1.15rem;
+  }
+
+  .feature-card p {
+    margin-top: 12px;
+    color: #8596ad;
+    line-height: 1.7;
+    font-size: 0.91rem;
+  }
+
+  .how-section {
+    padding-top: 20px;
+  }
+
+  .how-card {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 54px;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 26px;
+    background:
+      radial-gradient(
+        circle at 10% 30%,
+        rgba(37, 99, 235, 0.09),
+        transparent 38%
+      ),
+      rgba(255, 255, 255, 0.022);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 55px 1fr;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .step:last-child {
+    border-bottom: 0;
+  }
+
+  .step > span {
+    color: #4f87e2;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+  }
+
+  .step h3 {
+    color: #e9eef6;
+    font-size: 1rem;
+  }
+
+  .step p {
+    margin-top: 6px;
+    color: #7f91a8;
+    font-size: 0.88rem;
+  }
+
+  .faq-section {
+    padding-top: 70px;
+  }
+
+  .faq-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  details {
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  summary {
+    padding: 20px 22px;
+    cursor: pointer;
+    color: #dfe7f2;
+    font-weight: 700;
+  }
+
+  details p {
+    padding: 0 22px 20px;
+    color: #8395ad;
+    line-height: 1.7;
+    font-size: 0.9rem;
+  }
+
+  .site-footer {
+    margin-top: 80px;
+    border-top: 1px solid rgba(105, 155, 232, 0.12);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.07), transparent 30%),
+      #050d19;
+  }
+
+  .footer-shell {
+    width: min(1180px, 92%);
+    margin: 0 auto;
+  }
+
+  .footer-primary {
+    padding: 54px 0 46px;
+    display: grid;
+    grid-template-columns: 1.55fr repeat(3, 0.85fr);
+    gap: 42px;
+  }
+
+  .footer-about h3 {
+    margin-top: 20px;
+    color: #eef4fb;
+    font-size: 1.05rem;
+  }
+
+  .footer-about > p {
+    max-width: 430px;
+    margin-top: 10px;
+    color: #72869f;
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+
+  .footer-stats {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .footer-stats > div {
+    padding-right: 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .footer-stats > div:last-child {
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .footer-stats strong,
+  .footer-stats span {
+    display: block;
+  }
+
+  .footer-stats strong {
+    color: #76a9ff;
+    font-size: 1rem;
+  }
+
+  .footer-stats span {
+    margin-top: 2px;
+    color: #60748d;
+    font-size: 0.65rem;
+  }
+
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+  }
+
+  .footer-column h4 {
+    margin-bottom: 4px;
+    color: #dce6f2;
+    font-size: 0.82rem;
+  }
+
+  .footer-column a {
+    color: #7589a1;
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: color 0.18s ease;
+  }
+
+  .footer-column a:hover {
+    color: #8bb9ff;
+  }
+
+  .footer-column-copy {
+    color: #687c94;
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .footer-coming-soon,
+  .footer-disclosure {
+    margin-top: 8px;
+    padding: 11px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .footer-coming-soon span,
+  .footer-disclosure span {
+    color: #659bf0;
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .footer-coming-soon p,
+  .footer-disclosure p {
+    margin-top: 5px;
+    color: #60748d;
+    font-size: 0.66rem;
+    line-height: 1.5;
+  }
+
+  .footer-secondary {
+    min-height: 92px;
+    padding: 22px 0;
+    display: grid;
+    grid-template-columns: 1fr 1.7fr auto;
+    gap: 26px;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .footer-secondary > div strong,
+  .footer-secondary > div span {
+    display: block;
+  }
+
+  .footer-secondary > div strong {
+    color: #cdd9e8;
+    font-size: 0.78rem;
+  }
+
+  .footer-secondary > div span {
+    margin-top: 2px;
+    color: #52667f;
+    font-size: 0.66rem;
+  }
+
+  .footer-secondary > p {
+    color: #566b84;
+    text-align: center;
+    font-size: 0.68rem;
+    line-height: 1.55;
+  }
+
+  .copyright {
+    color: #50637a;
+    text-align: right;
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 55px;
+    }
+
+    .hero-copy {
+      text-align: center;
+    }
+
+    .hero-text {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-points {
+      justify-content: center;
+    }
+
+    .hardware-visual {
+      width: min(620px, 100%);
+      margin: 0 auto;
+    }
+
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .how-card {
+      grid-template-columns: 1fr;
+      gap: 35px;
+    }
+
+    .footer-primary {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-about {
+      grid-column: 1 / -1;
+    }
+
+    .footer-secondary {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .footer-secondary > p,
+    .copyright {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .purpose-choices,
+    .report-rating-grid,
+    .resolution-result-grid,
+    .ram-recommendation-grid,
+    .shopping-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .upgrade-card-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .method-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .confidence-points {
+      grid-template-columns: 1fr;
+    }
+
+    .compact-choice-row,
+    .performance-bars,
+    .report-summary-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hardware-profile-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .picker-topline,
+    .choice-heading,
+    .report-heading,
+    .upgrade-suggestions,
+    .method-heading,
+    .decision-heading,
+    .result-top-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .recommendation-heading > p,
+    .shopping-heading > p {
+      max-width: none;
+      text-align: left;
+    }
+
+    .brand-segments {
+      width: 100%;
+    }
+
+    .brand-chip {
+      flex: 1;
+    }
+
+    .resolution-choices,
+    .purpose-choices,
+    .report-rating-grid,
+    .method-grid,
+    .resolution-result-grid,
+    .ram-recommendation-grid,
+    .shopping-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .upgrade-pills {
+      justify-content: flex-start;
+    }
+
+    .smart-panel {
+      position: fixed;
+      top: 8vh;
+      left: 4vw;
+      right: 4vw;
+      max-height: 84vh;
+    }
+
+    .smart-options {
+      max-height: 62vh;
+    }
+
+    .hardware-picker-block.open-picker {
+      z-index: 9000;
+    }
+
+    .footer-primary {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      padding: 42px 0 34px;
+    }
+
+    .footer-about {
+      grid-column: auto;
+    }
+
+    .footer-stats {
+      gap: 14px;
+    }
+
+    .footer-stats > div {
+      padding-right: 14px;
+    }
+
+    .footer-column {
+      padding-top: 6px;
+    }
+
+    .profile-specs {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .nav {
+      display: none;
+    }
+
+    .hero {
+      min-height: auto;
+    }
+
+    .hero-inner {
+      padding: 70px 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 13vw, 4.3rem);
+    }
+
+    .hardware-visual {
+      min-height: auto;
+      grid-template-columns: 1fr;
+      padding: 20px;
+    }
+
+    .connection {
+      transform: rotate(90deg);
+      justify-content: center;
+      margin: -1px 0;
+    }
+
+    .visual-card {
+      width: 100%;
+      min-height: 210px;
+    }
+
+    .calculator-section,
+    .info-section,
+    .how-section,
+    .faq-section {
+      padding: 80px 0;
+    }
+
+    .calculator-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .calculator-card {
+      padding: 24px;
+    }
+
+    .calculate-button {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .how-card {
+      padding: 30px 24px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .result-main {
+      grid-template-columns: 1fr;
+    }
+
+    .experience-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .result-card {
+      padding: 24px 20px;
+    }
+
+    .result-topline {
+      flex-direction: column;
+    }
+
+    .match-badge {
+      width: 100%;
+    }
+
+    .bottleneck-meter {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .meter-ring {
+      margin: 0 auto;
+    }
+
+    .meter-copy p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  @media (max-width: 440px) {
+    .header-inner {
+      height: 68px;
+    }
+
+    .hero-points {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .calculator-card {
+      padding: 20px 16px;
+      border-radius: 20px;
+    }
+  }
+</style>
+
+<script>
+  const cpuBrandSelect = document.getElementById("cpuBrand") as HTMLSelectElement | null;
+  const gpuBrandSelect = document.getElementById("gpuBrand") as HTMLSelectElement | null;
+  const cpuSelect = document.getElementById("cpu") as HTMLSelectElement | null;
+  const gpuSelect = document.getElementById("gpu") as HTMLSelectElement | null;
+  const resolutionSelect = document.getElementById("resolution") as HTMLSelectElement | null;
+  const purposeSelect = document.getElementById("purpose") as HTMLSelectElement | null;
+  const ramSelect = document.getElementById("ram") as HTMLSelectElement | null;
+  const fpsSelect = document.getElementById("fps") as HTMLSelectElement | null;
+  const calculateButton = document.querySelector(".calculate-button") as HTMLButtonElement | null;
+
+  const resultCard = document.getElementById("resultCard");
+  const resultTitle = document.getElementById("resultTitle");
+  const resultPair = document.getElementById("resultPair");
+  const resultPercentage = document.getElementById("resultPercentage");
+  const resultType = document.getElementById("resultType");
+  const resultText = document.getElementById("resultText");
+  const resultRange = document.getElementById("resultRange");
+  const matchScore = document.getElementById("matchScore");
+  const matchBadge = document.getElementById("matchBadge");
+  const meterRing = document.getElementById("meterRing");
+  const overallMatch = document.getElementById("overallMatch");
+  const resultResolution = document.getElementById("resultResolution");
+  const resultPurpose = document.getElementById("resultPurpose");
+  const resultConfidence = document.getElementById("resultConfidence");
+  const upgradeText = document.getElementById("upgradeText");
+  const experienceText = document.getElementById("experienceText");
+  const ramText = document.getElementById("ramText");
+  const fpsText = document.getElementById("fpsText");
+  const methodCpuScore = document.getElementById("methodCpuScore");
+  const methodGpuScore = document.getElementById("methodGpuScore");
+  const methodResolution = document.getElementById("methodResolution");
+  const methodWorkload = document.getElementById("methodWorkload");
+  const methodFps = document.getElementById("methodFps");
+  const methodRam = document.getElementById("methodRam");
+  const confidenceSummary = document.getElementById("confidenceSummary");
+  const confidencePoints = document.getElementById("confidencePoints");
+  const newCalculationButton = document.getElementById("newCalculationButton");
+
+  const resolution1080Card = document.getElementById("resolution1080Card");
+  const resolution1440Card = document.getElementById("resolution1440Card");
+  const resolution4kCard = document.getElementById("resolution4kCard");
+  const resolution1080Status = document.getElementById("resolution1080Status");
+  const resolution1440Status = document.getElementById("resolution1440Status");
+  const resolution4kStatus = document.getElementById("resolution4kStatus");
+  const resolution1080Text = document.getElementById("resolution1080Text");
+  const resolution1440Text = document.getElementById("resolution1440Text");
+  const resolution4kText = document.getElementById("resolution4kText");
+  const resolution1080Percent = document.getElementById("resolution1080Percent");
+  const resolution1440Percent = document.getElementById("resolution1440Percent");
+  const resolution4kPercent = document.getElementById("resolution4kPercent");
+  const resolution1080Limit = document.getElementById("resolution1080Limit");
+  const resolution1440Limit = document.getElementById("resolution1440Limit");
+  const resolution4kLimit = document.getElementById("resolution4kLimit");
+
+  const actionList = document.getElementById("actionList");
+  const recommendedUpgradeTitle = document.getElementById("recommendedUpgradeTitle");
+  const recommendedUpgradeIntro = document.getElementById("recommendedUpgradeIntro");
+  const upgradeCardGrid = document.getElementById("upgradeCardGrid");
+
+  const ramMinimum = document.getElementById("ramMinimum");
+  const ramRecommended = document.getElementById("ramRecommended");
+  const ramHeavy = document.getElementById("ramHeavy");
+  const ramMinimumText = document.getElementById("ramMinimumText");
+  const ramRecommendedText = document.getElementById("ramRecommendedText");
+  const ramHeavyText = document.getElementById("ramHeavyText");
+
+  const shoppingCpuName = document.getElementById("shoppingCpuName");
+  const shoppingGpuName = document.getElementById("shoppingGpuName");
+  const shoppingRamName = document.getElementById("shoppingRamName");
+  const cpuAmazonLink = document.getElementById("cpuAmazonLink") as HTMLAnchorElement | null;
+  const cpuNeweggLink = document.getElementById("cpuNeweggLink") as HTMLAnchorElement | null;
+  const gpuAmazonLink = document.getElementById("gpuAmazonLink") as HTMLAnchorElement | null;
+  const gpuNeweggLink = document.getElementById("gpuNeweggLink") as HTMLAnchorElement | null;
+  const ramAmazonLink = document.getElementById("ramAmazonLink") as HTMLAnchorElement | null;
+  const ramNeweggLink = document.getElementById("ramNeweggLink") as HTMLAnchorElement | null;
+  const cpuProfileName = document.getElementById("cpuProfileName");
+  const cpuArchitecture = document.getElementById("cpuArchitecture");
+  const cpuCoresThreads = document.getElementById("cpuCoresThreads");
+  const cpuYear = document.getElementById("cpuYear");
+  const cpuGamingProfile = document.getElementById("cpuGamingProfile");
+  const cpuProductivityProfile = document.getElementById("cpuProductivityProfile");
+  const cpuSingleProfile = document.getElementById("cpuSingleProfile");
+
+  const gpuProfileName = document.getElementById("gpuProfileName");
+  const gpuArchitecture = document.getElementById("gpuArchitecture");
+  const gpuVram = document.getElementById("gpuVram");
+  const gpuYear = document.getElementById("gpuYear");
+  const gpuGamingProfile = document.getElementById("gpuGamingProfile");
+  const gpuRenderProfile = document.getElementById("gpuRenderProfile");
+  const gpuRtProfile = document.getElementById("gpuRtProfile");
+  const cpuBar = document.getElementById("cpuBar");
+  const gpuBar = document.getElementById("gpuBar");
+  const cpuBarValue = document.getElementById("cpuBarValue");
+  const gpuBarValue = document.getElementById("gpuBarValue");
+  const reportGrade = document.getElementById("reportGrade");
+  const gamingRating = document.getElementById("gamingRating");
+  const streamingRating = document.getElementById("streamingRating");
+  const editingRating = document.getElementById("editingRating");
+  const rayTracingRating = document.getElementById("rayTracingRating");
+  const reportStrengths = document.getElementById("reportStrengths");
+  const reportWatch = document.getElementById("reportWatch");
+  const upgradeHeading = document.getElementById("upgradeHeading");
+  const upgradeSuggestions = document.getElementById("upgradeSuggestions");
+
+  const resolutionDemand = {
+    "1080p": { cpu: 1.08, gpu: 0.98, label: "1920 × 1080 (1080p)" },
+    "1440p": { cpu: 1.0, gpu: 1.08, label: "2560 × 1440 (1440p)" },
+    "4k": { cpu: 0.92, gpu: 1.22, label: "3840 × 2160 (4K)" }
+  };
+
+  const purposeDemand = {
+    gaming: { cpu: 1.0, gpu: 1.0, label: "Gaming" },
+    streaming: { cpu: 1.12, gpu: 1.03, label: "Gaming & Streaming" },
+    editing: { cpu: 1.08, gpu: 1.07, label: "Video Editing" },
+    productivity: { cpu: 1.16, gpu: 0.82, label: "Productivity" }
+  };
+
+  const fpsDemand: Record<string, number> = {
+    "60": 0.94,
+    "75": 0.98,
+    "120": 1.07,
+    "144": 1.13,
+    "165": 1.18,
+    "240": 1.32
+  };
+
+  function selectedMetric(
+    select: HTMLSelectElement | null,
+    metric: string,
+    fallback = "score"
+  ) {
+    const option = select?.selectedOptions?.[0];
+    if (!option) return 0;
+
+    const value = option.dataset[metric as keyof DOMStringMap];
+    const fallbackValue = option.dataset[fallback as keyof DOMStringMap];
+
+    return Number(value || fallbackValue || 0);
+  }
+
+  function selectedName(select: HTMLSelectElement | null) {
+    return select?.selectedOptions?.[0]?.textContent?.trim() || "";
+  }
+
+  function clamp(value: number, min: number, max: number) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function getMatchLabel(bottleneck: number) {
+    if (bottleneck <= 5) return "Excellent";
+    if (bottleneck <= 10) return "Very Good";
+    if (bottleneck <= 16) return "Good";
+    if (bottleneck <= 24) return "Fair";
+    return "Mismatched";
+  }
+
+  function getBuildGrade(score: number) {
+    if (score >= 94) return "Elite";
+    if (score >= 88) return "Excellent";
+    if (score >= 80) return "Very Good";
+    if (score >= 70) return "Good";
+    if (score >= 60) return "Fair";
+    return "Entry";
+  }
+
+  function getConfidenceLabel(score: number) {
+    if (score >= 88) return `High · ${score}%`;
+    if (score >= 76) return `Good · ${score}%`;
+    if (score >= 62) return `Moderate · ${score}%`;
+    return `Limited · ${score}%`;
+  }
+
+  function benchmarkStatusScore(
+    type: "cpu" | "gpu",
+    benchmarkStatus: string,
+    pairingStatus: string
+  ) {
+    const b = benchmarkStatus.toLowerCase();
+    const p = pairingStatus.toLowerCase();
+
+    if (type === "cpu") {
+      if (b === "validated") return 94;
+      if (b === "derived") return 86;
+      if (p.includes("provisional-calibrated")) return 68;
+      if (b === "provisional") return 58;
+      return 60;
+    }
+
+    if (b === "validated") return 95;
+    if (b === "legacy-bridged") return 78;
+    if (p.includes("legacy")) return 74;
+    if (b === "provisional") return 56;
+    return 60;
+  }
+
+  function buildEstimateConfidence(args: {
+    cpuBenchmarkStatus: string;
+    cpuPairingStatus: string;
+    gpuBenchmarkStatus: string;
+    gpuPairingStatus: string;
+    cpuYear: number;
+    gpuYear: number;
+    purpose: string;
+    bottleneck: number;
+    fps: string;
+    ram: string;
+    hasNativeGpuScaling: boolean;
+  }) {
+    const cpuEvidence = benchmarkStatusScore(
+      "cpu",
+      args.cpuBenchmarkStatus,
+      args.cpuPairingStatus
+    );
+
+    const gpuEvidence = benchmarkStatusScore(
+      "gpu",
+      args.gpuBenchmarkStatus,
+      args.gpuPairingStatus
+    );
+
+    let score = Math.round(
+      cpuEvidence * 0.52 +
+      gpuEvidence * 0.48
+    );
+
+    if (args.purpose === "gaming" && args.hasNativeGpuScaling) score += 3;
+    if (args.fps) score += 3;
+    else score -= 2;
+    if (args.ram) score += 1;
+
+    if (args.cpuYear && args.cpuYear < 2017) score -= 5;
+    if (args.gpuYear && args.gpuYear < 2017) score -= 6;
+
+    if (args.bottleneck === 0) score -= 2;
+    else if (args.bottleneck <= 10) score -= 4;
+    else if (args.bottleneck >= 30) score += 2;
+
+    score = clamp(score, 45, 96);
+
+    let margin = Math.round(
+      3 +
+      (100 - score) * 0.11 +
+      (args.bottleneck <= 10 ? 2 : 0)
+    );
+
+    margin = clamp(margin, 4, 13);
+
+    const low = Math.max(0, args.bottleneck - margin);
+    const high = Math.min(80, args.bottleneck + margin);
+
+    return {
+      score,
+      margin,
+      low,
+      high,
+      label: getConfidenceLabel(score)
+    };
+  }
+
+  function getRamMessage(value: string) {
+    if (!value) return "Not selected";
+    if (value === "8") return "8 GB may limit modern workloads";
+    if (value === "16") return "16 GB is a solid baseline";
+    if (value === "32") return "32 GB is excellent for most users";
+    if (value === "64") return "64 GB suits heavy workloads";
+    return "128 GB+ is workstation-class capacity";
+  }
+
+  function getExperience(
+    limitingHeadroom: number,
+    resolution: string,
+    purpose: string
+  ) {
+    if (purpose === "productivity") {
+      if (limitingHeadroom >= 82) return "Excellent general productivity";
+      if (limitingHeadroom >= 68) return "Very good everyday productivity";
+      if (limitingHeadroom >= 55) return "Good for normal desktop work";
+      return "Better suited to lighter workloads";
+    }
+
+    if (purpose === "editing") {
+      if (limitingHeadroom >= 82) return "Excellent editing headroom";
+      if (limitingHeadroom >= 68) return "Very good for mainstream editing";
+      if (limitingHeadroom >= 55) return "Good for moderate editing";
+      return "Best for lighter editing projects";
+    }
+
+    const resolutionName =
+      resolution === "4k" ? "4K" : resolution === "1440p" ? "1440p" : "1080p";
+
+    if (limitingHeadroom >= 88) return `Excellent for ${resolutionName}`;
+    if (limitingHeadroom >= 74) return `Very good for ${resolutionName}`;
+    if (limitingHeadroom >= 62) return `Good for ${resolutionName}`;
+    if (limitingHeadroom >= 50) return `Usable for ${resolutionName} with tuned settings`;
+    return `${resolutionName} may require lower settings`;
+  }
+
+  function profileRating(score: number) {
+    if (!score) return "—";
+    if (score >= 95) return `Elite · ${score}/100`;
+    if (score >= 85) return `Excellent · ${score}/100`;
+    if (score >= 75) return `Very Good · ${score}/100`;
+    if (score >= 65) return `Good · ${score}/100`;
+    if (score >= 50) return `Moderate · ${score}/100`;
+    return `Entry · ${score}/100`;
+  }
+
+  function updateCpuProfile() {
+    const option = cpuSelect?.selectedOptions?.[0];
+
+    if (!option || !option.value) {
+      if (cpuProfileName) cpuProfileName.textContent = "Select a CPU";
+      if (cpuArchitecture) cpuArchitecture.textContent = "—";
+      if (cpuCoresThreads) cpuCoresThreads.textContent = "—";
+      if (cpuYear) cpuYear.textContent = "—";
+      if (cpuGamingProfile) cpuGamingProfile.textContent = "—";
+      if (cpuProductivityProfile) cpuProductivityProfile.textContent = "—";
+      if (cpuSingleProfile) cpuSingleProfile.textContent = "—";
+      return;
+    }
+
+    if (cpuProfileName) cpuProfileName.textContent = option.textContent?.trim() || "Selected CPU";
+    if (cpuArchitecture) cpuArchitecture.textContent = option.dataset.architecture || "—";
+    if (cpuCoresThreads) {
+      const cores = option.dataset.cores || "—";
+      const threads = option.dataset.threads || "—";
+      cpuCoresThreads.textContent = `${cores} / ${threads}`;
+    }
+    if (cpuYear) cpuYear.textContent = option.dataset.year || "—";
+    if (cpuGamingProfile) cpuGamingProfile.textContent = profileRating(Number(option.dataset.gaming || 0));
+    if (cpuProductivityProfile) cpuProductivityProfile.textContent = profileRating(Number(option.dataset.productivity || 0));
+    if (cpuSingleProfile) cpuSingleProfile.textContent = profileRating(Number(option.dataset.single || 0));
+  }
+
+  function updateGpuProfile() {
+    const option = gpuSelect?.selectedOptions?.[0];
+
+    if (!option || !option.value) {
+      if (gpuProfileName) gpuProfileName.textContent = "Select a GPU";
+      if (gpuArchitecture) gpuArchitecture.textContent = "—";
+      if (gpuVram) gpuVram.textContent = "—";
+      if (gpuYear) gpuYear.textContent = "—";
+      if (gpuGamingProfile) gpuGamingProfile.textContent = "—";
+      if (gpuRenderProfile) gpuRenderProfile.textContent = "—";
+      if (gpuRtProfile) gpuRtProfile.textContent = "—";
+      return;
+    }
+
+    if (gpuProfileName) gpuProfileName.textContent = option.textContent?.trim() || "Selected GPU";
+    if (gpuArchitecture) gpuArchitecture.textContent = option.dataset.architecture || "—";
+    if (gpuVram) gpuVram.textContent = option.dataset.vram ? `${option.dataset.vram} GB` : "—";
+    if (gpuYear) gpuYear.textContent = option.dataset.year || "—";
+    if (gpuGamingProfile) gpuGamingProfile.textContent = profileRating(Number(option.dataset.gaming || 0));
+    if (gpuRenderProfile) gpuRenderProfile.textContent = profileRating(Number(option.dataset.render || 0));
+    if (gpuRtProfile) gpuRtProfile.textContent = profileRating(Number(option.dataset.rt || 0));
+  }
+
+  function closeSmartPanels(except?: Element | null) {
+    document.querySelectorAll(".smart-select").forEach((picker) => {
+      if (picker === except) return;
+
+      const trigger = picker.querySelector(".smart-trigger") as HTMLButtonElement | null;
+      const panel = picker.querySelector(".smart-panel") as HTMLElement | null;
+      const block = picker.closest(".hardware-picker-block");
+
+      picker.classList.remove("open");
+      block?.classList.remove("open-picker");
+
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (panel) panel.hidden = true;
+    });
+  }
+
+  function syncSmartPicker(type: "cpu" | "gpu") {
+    const select = type === "cpu" ? cpuSelect : gpuSelect;
+    const triggerText = document.getElementById(`${type}TriggerText`);
+    const picker = document.querySelector(`[data-picker="${type}"]`);
+    if (!select || !picker) return;
+
+    const selected = select.selectedOptions?.[0];
+    if (triggerText) {
+      triggerText.textContent =
+        selected?.value ? selected.textContent?.trim() || "Selected" : `Select your ${type.toUpperCase()}`;
+    }
+
+    picker.querySelectorAll(".smart-option").forEach((option) => {
+      option.classList.toggle(
+        "selected",
+        (option as HTMLElement).dataset.value === select.value
+      );
+    });
+  }
+
+  function applyHardwarePickerFilter(type: "cpu" | "gpu") {
+    const picker = document.querySelector(`[data-picker="${type}"]`);
+    const brandSelect = type === "cpu" ? cpuBrandSelect : gpuBrandSelect;
+    const input = document.getElementById(`${type}Search`) as HTMLInputElement | null;
+    const noResults = document.getElementById(`${type}NoResults`);
+    if (!picker) return;
+
+    const query = (input?.value || "").trim().toLowerCase();
+    const brand = brandSelect?.value || "";
+    let visible = 0;
+
+    picker.querySelectorAll(".smart-option").forEach((node) => {
+      const option = node as HTMLButtonElement;
+      const matchesBrand = !brand || option.dataset.brand === brand;
+      const matchesSearch = !query || (option.dataset.search || "").includes(query);
+      option.hidden = !(matchesBrand && matchesSearch);
+      if (!option.hidden) visible += 1;
+    });
+
+    const popularSection = picker.querySelector("[data-popular-section]") as HTMLElement | null;
+    if (popularSection) {
+      popularSection.hidden = Boolean(query);
+    }
+
+    if (noResults) noResults.hidden = visible !== 0;
+  }
+
+  document.querySelectorAll(".smart-select").forEach((picker) => {
+    const type = (picker as HTMLElement).dataset.picker as "cpu" | "gpu";
+    const trigger = picker.querySelector(".smart-trigger") as HTMLButtonElement | null;
+    const panel = picker.querySelector(".smart-panel") as HTMLElement | null;
+    const input = picker.querySelector(".smart-search") as HTMLInputElement | null;
+    const select = type === "cpu" ? cpuSelect : gpuSelect;
+
+    trigger?.addEventListener("click", () => {
+      const opening = panel?.hidden ?? true;
+      const block = picker.closest(".hardware-picker-block");
+
+      closeSmartPanels(picker);
+
+      if (panel) panel.hidden = !opening;
+      trigger.setAttribute("aria-expanded", opening ? "true" : "false");
+
+      picker.classList.toggle("open", opening);
+      block?.classList.toggle("open-picker", opening);
+
+      if (opening) {
+        applyHardwarePickerFilter(type);
+        window.setTimeout(() => input?.focus(), 20);
+      }
+    });
+
+    input?.addEventListener("input", () => applyHardwarePickerFilter(type));
+
+    picker.querySelectorAll(".smart-option").forEach((option) => {
+      option.addEventListener("click", () => {
+        if (!select) return;
+        select.value = (option as HTMLElement).dataset.value || "";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        syncSmartPicker(type);
+        if (panel) panel.hidden = true;
+        trigger?.setAttribute("aria-expanded", "false");
+        picker.classList.remove("open");
+        picker.closest(".hardware-picker-block")?.classList.remove("open-picker");
+      });
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target as Node;
+    if (!document.querySelector(".smart-select")?.contains(target)) {
+      const insideAny = Array.from(document.querySelectorAll(".smart-select")).some((el) => el.contains(target));
+      if (!insideAny) closeSmartPanels();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeSmartPanels();
+  });
+
+  document.querySelectorAll("[data-brand-group]").forEach((group) => {
+    group.querySelectorAll(".brand-chip").forEach((button) => {
+      button.addEventListener("click", () => {
+        const type = (group as HTMLElement).dataset.brandGroup as "cpu" | "gpu";
+        const brandSelect = type === "cpu" ? cpuBrandSelect : gpuBrandSelect;
+        if (!brandSelect) return;
+
+        group.querySelectorAll(".brand-chip").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        brandSelect.value = (button as HTMLElement).dataset.brand || "";
+        brandSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        applyHardwarePickerFilter(type);
+      });
+    });
+  });
+
+  document.querySelectorAll("[data-control]").forEach((group) => {
+    group.querySelectorAll("[data-value]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const controlId = (group as HTMLElement).dataset.control || "";
+        const select = document.getElementById(controlId) as HTMLSelectElement | null;
+        if (!select) return;
+
+        group.querySelectorAll("[data-value]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        select.value = (button as HTMLElement).dataset.value || "";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    });
+  });
+
+  function filterHardwareByBrand(
+    brandSelect: HTMLSelectElement | null,
+    hardwareSelect: HTMLSelectElement | null
+  ) {
+    if (!brandSelect || !hardwareSelect) return;
+
+    const chosenBrand = brandSelect.value;
+
+    Array.from(hardwareSelect.options).forEach((option, index) => {
+      if (index === 0) {
+        option.hidden = false;
+        return;
+      }
+
+      const optionBrand = option.dataset.brand || "";
+      option.hidden = Boolean(chosenBrand && optionBrand !== chosenBrand);
+    });
+
+    const selectedOption = hardwareSelect.selectedOptions?.[0];
+    if (
+      selectedOption &&
+      selectedOption.value &&
+      chosenBrand &&
+      selectedOption.dataset.brand !== chosenBrand
+    ) {
+      hardwareSelect.value = "";
+    }
+  }
+
+  cpuBrandSelect?.addEventListener("change", () => {
+    filterHardwareByBrand(cpuBrandSelect, cpuSelect);
+    applyHardwarePickerFilter("cpu");
+    syncSmartPicker("cpu");
+    updateCpuProfile();
+  });
+
+  gpuBrandSelect?.addEventListener("change", () => {
+    filterHardwareByBrand(gpuBrandSelect, gpuSelect);
+    applyHardwarePickerFilter("gpu");
+    syncSmartPicker("gpu");
+    updateGpuProfile();
+  });
+
+  cpuSelect?.addEventListener("change", () => {
+    updateCpuProfile();
+    syncSmartPicker("cpu");
+  });
+
+  gpuSelect?.addEventListener("change", () => {
+    updateGpuProfile();
+    syncSmartPicker("gpu");
+  });
+
+  filterHardwareByBrand(cpuBrandSelect, cpuSelect);
+  filterHardwareByBrand(gpuBrandSelect, gpuSelect);
+  updateCpuProfile();
+  updateGpuProfile();
+  syncSmartPicker("cpu");
+  syncSmartPicker("gpu");
+
+  function qualitative(score: number) {
+    if (score >= 92) return "Elite";
+    if (score >= 82) return "Excellent";
+    if (score >= 70) return "Very Good";
+    if (score >= 58) return "Good";
+    if (score >= 45) return "Moderate";
+    return "Limited";
+  }
+
+  function topUpgradeNames(
+    select: HTMLSelectElement | null,
+    currentScore: number,
+    metric = "gaming",
+    max = 3,
+    sameBrand = false
+  ) {
+    if (!select) return [];
+
+    const currentOption = select.selectedOptions?.[0];
+    const currentBrand = currentOption?.dataset.brand || "";
+
+    return Array.from(select.options)
+      .filter((option) => {
+        if (!option.value) return false;
+
+        const optionScore = Number(
+          option.dataset[metric as keyof DOMStringMap] ||
+          option.dataset.score ||
+          0
+        );
+
+        const benchmarkStatus = option.dataset.benchmarkStatus || "";
+        const validatedEnough =
+          metric !== "pairingIndex" ||
+          benchmarkStatus === "validated" ||
+          benchmarkStatus === "derived" ||
+          benchmarkStatus === "legacy-bridged";
+
+        const clearsUpgradeGap =
+          metric === "pairingIndex"
+            ? optionScore >= currentScore * 1.10
+            : optionScore >= currentScore + 7;
+
+        const brandAllowed =
+          !sameBrand || option.dataset.brand === currentBrand;
+
+        return validatedEnough && clearsUpgradeGap && brandAllowed;
+      })
+      .sort(
+        (a, b) =>
+          Number(
+            a.dataset[metric as keyof DOMStringMap] ||
+            a.dataset.score ||
+            0
+          ) -
+          Number(
+            b.dataset[metric as keyof DOMStringMap] ||
+            b.dataset.score ||
+            0
+          )
+      )
+      .slice(0, max)
+      .map((option) => option.textContent?.trim() || "")
+      .filter(Boolean);
+  }
+
+  function retailerUrl(retailer: "amazon" | "newegg", query: string) {
+    const encoded = encodeURIComponent(query);
+
+    if (retailer === "amazon") {
+      return `https://www.amazon.com/s?k=${encoded}`;
+    }
+
+    return `https://www.newegg.com/p/pl?d=${encoded}`;
+  }
+
+  function getUpgradeCandidates(
+    select: HTMLSelectElement | null,
+    currentScore: number,
+    metric = "gaming",
+    max = 2,
+    sameBrand = false
+  ) {
+    if (!select) return [];
+
+    const currentOption = select.selectedOptions?.[0];
+    const currentBrand = currentOption?.dataset.brand || "";
+
+    return Array.from(select.options)
+      .filter((option) => {
+        if (!option.value) return false;
+
+        const score = Number(
+          option.dataset[metric as keyof DOMStringMap] ||
+          option.dataset.score ||
+          0
+        );
+
+        const benchmarkStatus = option.dataset.benchmarkStatus || "";
+
+        // Never recommend a provisional component as an "upgrade".
+        const validatedEnough =
+          benchmarkStatus === "validated" ||
+          benchmarkStatus === "derived" ||
+          benchmarkStatus === "legacy-bridged";
+
+        return (
+          validatedEnough &&
+          score >= currentScore * 1.10 &&
+          (!sameBrand || option.dataset.brand === currentBrand)
+        );
+      })
+      .sort(
+        (a, b) =>
+          Number(
+            a.dataset[metric as keyof DOMStringMap] ||
+            a.dataset.score ||
+            0
+          ) -
+          Number(
+            b.dataset[metric as keyof DOMStringMap] ||
+            b.dataset.score ||
+            0
+          )
+      )
+      .slice(0, max)
+      .map((option) => {
+        const score = Number(
+          option.dataset[metric as keyof DOMStringMap] ||
+          option.dataset.score ||
+          0
+        );
+
+        return {
+          name: option.textContent?.trim() || "Upgrade option",
+          score,
+          relativeGain: Math.max(
+            1,
+            Math.round(((score - currentScore) / Math.max(currentScore, 1)) * 100)
+          )
+        };
+      });
+  }
+
+  function ramGuidance(purpose: string) {
+    if (purpose === "editing") {
+      return {
+        minimum: "32 GB",
+        recommended: "64 GB",
+        heavy: "128 GB",
+        minimumText: "Suitable for mainstream editing projects and moderate timelines.",
+        recommendedText: "A stronger target for larger projects, multitasking, and heavier media.",
+        heavyText: "Useful for demanding professional projects, large caches, and workstation use."
+      };
+    }
+
+    if (purpose === "streaming") {
+      return {
+        minimum: "16 GB",
+        recommended: "32 GB",
+        heavy: "64 GB",
+        minimumText: "Usable for gaming plus a light streaming setup.",
+        recommendedText: "A comfortable target for gaming, streaming, browser tabs, and background tools.",
+        heavyText: "Useful for heavier multitasking, editing, and creator workflows alongside gaming."
+      };
+    }
+
+    if (purpose === "productivity") {
+      return {
+        minimum: "16 GB",
+        recommended: "32 GB",
+        heavy: "64 GB",
+        minimumText: "Enough for normal office work, browsing, and everyday multitasking.",
+        recommendedText: "A strong all-round target for heavier multitasking and professional applications.",
+        heavyText: "Useful for large datasets, virtual machines, creative work, and heavy multitasking."
+      };
+    }
+
+    return {
+      minimum: "16 GB",
+      recommended: "32 GB",
+      heavy: "64 GB",
+      minimumText: "A practical minimum for modern gaming and everyday PC use.",
+      recommendedText: "The best all-round target for modern games, background apps, and future headroom.",
+      heavyText: "Useful for streaming, heavy modding, creation work, and demanding multitasking."
+    };
+  }
+
+  function gamingResolutionAnalysis(
+    cpuPairingIndex: number,
+    gpuPairingIndex: number,
+    fpsValue: string,
+    resolutionKey: "1080p" | "1440p" | "4k",
+    gpuFps1080 = 0,
+    gpuFps1440 = 0,
+    gpuFps4k = 0
+  ) {
+    /*
+      PC BALANCE GAMING ENGINE V2
+      ---------------------------
+      1. CPU and GPU still meet on the benchmark-calibrated pairing domain.
+      2. CPU-limited systems keep the proven resolution-relief curve.
+      3. GPU-limited systems use a nonlinear calibration curve so small but
+         real mismatches are not understated.
+      4. Actual native-resolution GPU raster retention is used as a secondary
+         correction when validated FPS data exists.
+      5. A dead zone prevents tiny benchmark noise from becoming a fake
+         bottleneck percentage.
+
+      The displayed percentage is a comparative pairing estimate, not a
+      literal universal utilization measurement.
+    */
+
+    const BALANCE_GPU_TO_CPU = 54.7 / 66.0;
+    const DEADZONE = 1.15;
+
+    const cpuIndex = Math.max(cpuPairingIndex, 1);
+    const gpuIndex = Math.max(gpuPairingIndex, 1);
+
+    const baseRatio =
+      gpuIndex / (cpuIndex * BALANCE_GPU_TO_CPU);
+
+    let ratio = baseRatio;
+
+    if (baseRatio >= 1) {
+      /*
+        CPU-side limitation:
+        Higher resolutions normally reduce CPU pressure because the GPU has
+        more work per frame. These factors were retained from the previous
+        engine because they matched our high-end GPU scaling sanity tests.
+      */
+      const cpuRelief = {
+        "1080p": 1.00,
+        "1440p": 1.47,
+        "4k": 2.60
+      };
+
+      ratio = baseRatio / cpuRelief[resolutionKey];
+
+      // Resolution can relieve an existing CPU limitation, but the resolution
+      // adjustment alone must not manufacture a new GPU bottleneck. Once the
+      // balance point is reached, treat the pairing as balanced.
+      if (ratio < 1) {
+        ratio = 1;
+      }
+    } else {
+      /*
+        GPU-side limitation:
+        A nearly-balanced PC should not suddenly become a large "bottleneck"
+        at 1440p simply because every GPU produces fewer FPS there. Instead,
+        resolution pressure grows with how far the GPU already trails the CPU.
+
+        4K has an unavoidable baseline graphics penalty, while 1440p applies
+        mainly to already GPU-heavy pairings.
+      */
+      const weakness = clamp(1 - baseRatio, 0, 0.85);
+
+      const gpuResolutionPenalty = {
+        "1080p": 1.00,
+        "1440p": 1.00 + weakness * 0.90,
+        "4k": 1.40 + weakness * 1.00
+      };
+
+      ratio =
+        baseRatio /
+        gpuResolutionPenalty[resolutionKey];
+
+      /*
+        Native-resolution retention correction.
+        RTX 3060 is used only as a neutral retention anchor because it was one
+        of our independently checked balanced baseline combinations.
+
+        If a GPU loses unusually more performance than that anchor at the
+        selected resolution, the GPU-side result gets a modest additional
+        penalty. The correction is deliberately capped.
+      */
+      if (
+        resolutionKey !== "1080p" &&
+        gpuFps1080 > 0
+      ) {
+        const selectedFps =
+          resolutionKey === "1440p"
+            ? gpuFps1440
+            : gpuFps4k;
+
+        if (selectedFps > 0) {
+          const actualRetention =
+            selectedFps / gpuFps1080;
+
+          const neutralRetention =
+            resolutionKey === "1440p"
+              ? 41.9 / 61.5
+              : 22.2 / 61.5;
+
+          const retentionCorrection = clamp(
+            neutralRetention /
+              Math.max(actualRetention, 0.05),
+            0.92,
+            1.12
+          );
+
+          ratio /= retentionCorrection;
+        }
+      }
+    }
+
+    /*
+      High-refresh targets shift pressure back toward the CPU.
+      These are intentionally mild because a selected target FPS is context,
+      not proof that every game will reach that frame rate.
+    */
+    const fpsCpuPressure: Record<string, number> = {
+      "60": 1.00,
+      "75": 1.01,
+      "120": 1.05,
+      "144": 1.08,
+      "165": 1.11,
+      "240": 1.18
+    };
+
+    if (fpsValue) {
+      ratio *= fpsCpuPressure[fpsValue] || 1;
+    }
+
+    // Preserve the original limiting side after contextual adjustments.
+    // Context can reduce a mismatch to balanced, but should not invert it
+    // without component data actually supporting the opposite direction.
+    if (baseRatio >= 1 && ratio < 1) {
+      ratio = 1;
+    } else if (baseRatio < 1 && ratio > 1) {
+      ratio = 1;
+    }
+
+    let mismatch = 0;
+    let cpuLimit = false;
+    let gpuLimit = false;
+
+    if (ratio > DEADZONE) {
+      cpuLimit = true;
+
+      const distance =
+        Math.log(ratio / DEADZONE);
+
+      mismatch = Math.round(
+        distance * 47.5
+      );
+    } else if (ratio < 1 / DEADZONE) {
+      gpuLimit = true;
+
+      const distance =
+        Math.log(
+          (1 / ratio) / DEADZONE
+        );
+
+      /*
+        Nonlinear GPU-side calibration:
+        The old linear curve systematically understated mild GPU mismatches
+        while already matching severe examples well. This exponent curve is
+        calibrated to preserve the severe i5-12400F + RX 580 case while
+        correcting mild cases such as Core Ultra 7 270K Plus + RTX 5060.
+      */
+      mismatch = Math.round(
+        52.61 *
+          Math.pow(
+            Math.max(distance, 0),
+            0.607
+          )
+      );
+    }
+
+    mismatch = clamp(mismatch, 0, 80);
+
+    if (mismatch < 5) {
+      mismatch = 0;
+      cpuLimit = false;
+      gpuLimit = false;
+    }
+
+    const status =
+      mismatch === 0
+        ? "Excellent"
+        : mismatch <= 10
+          ? "Very Good"
+          : mismatch <= 18
+            ? "Good"
+            : mismatch <= 30
+              ? "Fair"
+              : "Limited";
+
+    let text = "";
+    let limit = "";
+
+    if (mismatch === 0) {
+      text =
+        "No major CPU–GPU pairing mismatch stands out at this resolution. The limiting component can still change by game, graphics settings, and target frame rate.";
+      limit = "No major mismatch";
+    } else if (cpuLimit) {
+      text =
+        "The graphics card is fast enough to expose processor limits more often at this resolution, especially in CPU-heavy and high-refresh games.";
+      limit = "CPU more likely to limit";
+    } else {
+      text =
+        "The graphics card has less gaming headroom than the processor for this target. The gap becomes more important as resolution, visual quality, or ray-tracing demand increases.";
+      limit = "GPU more likely to limit";
+    }
+
+    return {
+      mismatch,
+      status,
+      text,
+      limit,
+      cpuLimit,
+      gpuLimit,
+      pairingRatio: ratio
+    };
+  }
+
+  function resolutionAnalysis(
+    cpuScore: number,
+    gpuScore: number,
+    purposeKey: string,
+    fpsValue: string,
+    resolutionKey: "1080p" | "1440p" | "4k",
+    cpuPairingIndex = 0,
+    gpuPairingIndex = 0,
+    gpuFps1080 = 0,
+    gpuFps1440 = 0,
+    gpuFps4k = 0
+  ) {
+    if (purposeKey === "gaming" && cpuPairingIndex && gpuPairingIndex) {
+      return gamingResolutionAnalysis(
+        cpuPairingIndex,
+        gpuPairingIndex,
+        fpsValue,
+        resolutionKey,
+        gpuFps1080,
+        gpuFps1440,
+        gpuFps4k
+      );
+    }
+
+    const resolutionMap = {
+      "1080p": { cpu: 1.08, gpu: 0.96 },
+      "1440p": { cpu: 0.99, gpu: 1.07 },
+      "4k": { cpu: 0.91, gpu: 1.22 }
+    };
+
+    const purposeMap = {
+      gaming: { cpu: 1.00, gpu: 1.00 },
+      streaming: { cpu: 1.10, gpu: 1.03 },
+      editing: { cpu: 1.09, gpu: 1.06 },
+      productivity: { cpu: 1.12, gpu: 0.84 }
+    };
+
+    const fpsMap: Record<string, { cpu: number; gpu: number }> = {
+      "60": { cpu: 0.94, gpu: 0.98 },
+      "75": { cpu: 0.98, gpu: 1.00 },
+      "120": { cpu: 1.07, gpu: 1.03 },
+      "144": { cpu: 1.13, gpu: 1.05 },
+      "165": { cpu: 1.18, gpu: 1.07 },
+      "240": { cpu: 1.31, gpu: 1.10 }
+    };
+
+    const r = resolutionMap[resolutionKey];
+    const p =
+      purposeMap[purposeKey as keyof typeof purposeMap] ||
+      purposeMap.gaming;
+    const f = fpsValue
+      ? fpsMap[fpsValue] || { cpu: 1, gpu: 1 }
+      : { cpu: 1, gpu: 1 };
+
+    const cpuEff = cpuScore / (r.cpu * p.cpu * f.cpu);
+    const gpuEff = gpuScore / (r.gpu * p.gpu * f.gpu);
+
+    const stronger = Math.max(cpuEff, gpuEff);
+    const weaker = Math.min(cpuEff, gpuEff);
+    const raw =
+      stronger > 0 ? ((stronger - weaker) / stronger) * 100 : 0;
+
+    const mismatch = clamp(
+      Math.max(1, Math.round(raw * 0.55)),
+      1,
+      45
+    );
+
+    const cpuLimit = cpuEff < gpuEff;
+    const gpuLimit = gpuEff < cpuEff;
+    const balanced = mismatch <= 5;
+
+    const status =
+      mismatch <= 5
+        ? "Excellent"
+        : mismatch <= 10
+          ? "Very Good"
+          : mismatch <= 16
+            ? "Good"
+            : mismatch <= 24
+              ? "Fair"
+              : "Mismatched";
+
+    let text = "";
+    let limit = "";
+
+    if (balanced) {
+      text =
+        "No major CPU–GPU mismatch stands out for this workload.";
+      limit = "No major mismatch";
+    } else if (cpuLimit) {
+      text =
+        "The CPU becomes the more likely constraint for this workload.";
+      limit = "CPU more likely to limit";
+    } else {
+      text =
+        "The GPU becomes the more likely constraint for this workload.";
+      limit = "GPU more likely to limit";
+    }
+
+    return {
+      mismatch,
+      status,
+      text,
+      limit,
+      cpuLimit,
+      gpuLimit,
+      pairingRatio: 1
+    };
+  }
+
+  function setResolutionCard(
+    key: "1080p" | "1440p" | "4k",
+    result: ReturnType<typeof resolutionAnalysis>,
+    selectedResolution: string
+  ) {
+    const map = {
+      "1080p": {
+        card: resolution1080Card,
+        status: resolution1080Status,
+        text: resolution1080Text,
+        percent: resolution1080Percent,
+        limit: resolution1080Limit
+      },
+      "1440p": {
+        card: resolution1440Card,
+        status: resolution1440Status,
+        text: resolution1440Text,
+        percent: resolution1440Percent,
+        limit: resolution1440Limit
+      },
+      "4k": {
+        card: resolution4kCard,
+        status: resolution4kStatus,
+        text: resolution4kText,
+        percent: resolution4kPercent,
+        limit: resolution4kLimit
+      }
+    };
+
+    const target = map[key];
+    target.card?.classList.toggle(
+      "selected-resolution",
+      key === selectedResolution
+    );
+
+    if (target.status) target.status.textContent = result.status;
+    if (target.text) target.text.textContent = result.text;
+    if (target.percent) {
+      target.percent.textContent = `${result.mismatch}% estimated mismatch`;
+    }
+    if (target.limit) target.limit.textContent = result.limit;
+  }
+
+  newCalculationButton?.addEventListener("click", () => {
+    document.getElementById("calculator")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    window.setTimeout(() => {
+      document.querySelector('[data-picker="cpu"] .smart-trigger')?.dispatchEvent(
+        new MouseEvent("click", { bubbles: true })
+      );
+    }, 450);
+  });
+
+  calculateButton?.addEventListener("click", () => {
+    if (!cpuSelect?.value || !gpuSelect?.value) {
+      alert("Please select both a CPU and GPU.");
+      return;
+    }
+
+    const resolution = resolutionSelect?.value || "1080p";
+    const purpose = purposeSelect?.value || "gaming";
+    const ram = ramSelect?.value || "";
+    const fps = fpsSelect?.value || "";
+
+    const cpuGaming = selectedMetric(cpuSelect, "gaming");
+    const cpuProductivity = selectedMetric(cpuSelect, "productivity");
+    const cpuSingle = selectedMetric(cpuSelect, "single");
+    const cpuMulti = selectedMetric(cpuSelect, "multi");
+
+    const gpuGaming = selectedMetric(gpuSelect, "gaming");
+    const gpuRender = selectedMetric(gpuSelect, "render");
+    const gpuRayTracing = selectedMetric(gpuSelect, "rt");
+
+    const cpuGamingIndex =
+      selectedMetric(cpuSelect, "gamingIndex") || cpuGaming * 0.82;
+
+    const cpuPairingIndex =
+      selectedMetric(cpuSelect, "pairingIndex") || cpuGamingIndex;
+
+    const gpuPairingIndex =
+      selectedMetric(gpuSelect, "pairingIndex") || gpuGaming;
+
+    const gpuFps1080 = selectedMetric(gpuSelect, "fps1080");
+    const gpuFps1440 = selectedMetric(gpuSelect, "fps1440");
+    const gpuFps4k = selectedMetric(gpuSelect, "fps4k");
+
+    if (
+      !cpuGaming ||
+      !cpuProductivity ||
+      !cpuSingle ||
+      !cpuMulti ||
+      !gpuGaming ||
+      !gpuRender
+    ) {
+      alert("This hardware entry is missing performance data.");
+      return;
+    }
+
+    /*
+      V3 CONTEXT MODEL
+      ----------------
+      We do not treat one synthetic score as a literal bottleneck.
+      First, CPU/GPU capability is blended for the selected workload.
+      Then resolution, FPS and RAM alter the demand placed on each side.
+      Finally, pairing balance and absolute component quality are scored
+      separately so a balanced low-end PC cannot receive a fake 100/100.
+    */
+
+    let cpuScore = cpuGaming * 0.55 + cpuSingle * 0.30 + cpuMulti * 0.15;
+    let gpuScore = gpuGaming;
+
+    if (purpose === "streaming") {
+      cpuScore =
+        cpuGaming * 0.35 +
+        cpuSingle * 0.15 +
+        cpuMulti * 0.35 +
+        cpuProductivity * 0.15;
+
+      gpuScore = gpuGaming * 0.82 + gpuRender * 0.18;
+    }
+
+    if (purpose === "editing") {
+      cpuScore =
+        cpuProductivity * 0.45 +
+        cpuMulti * 0.40 +
+        cpuSingle * 0.15;
+
+      gpuScore = gpuRender * 0.78 + gpuGaming * 0.22;
+    }
+
+    if (purpose === "productivity") {
+      cpuScore =
+        cpuProductivity * 0.45 +
+        cpuSingle * 0.25 +
+        cpuMulti * 0.30;
+
+      gpuScore = gpuRender * 0.62 + gpuGaming * 0.38;
+    }
+
+    const resolutionProfile = {
+      "1080p": {
+        cpuDemand: 1.08,
+        gpuDemand: 0.96,
+        label: "1920 × 1080 (1080p)"
+      },
+      "1440p": {
+        cpuDemand: 0.99,
+        gpuDemand: 1.07,
+        label: "2560 × 1440 (1440p)"
+      },
+      "4k": {
+        cpuDemand: 0.91,
+        gpuDemand: 1.22,
+        label: "3840 × 2160 (4K)"
+      }
+    };
+
+    const purposeProfile = {
+      gaming: {
+        cpuDemand: 1.00,
+        gpuDemand: 1.00,
+        label: "Gaming",
+        cpuWeight: 0.42,
+        gpuWeight: 0.58
+      },
+      streaming: {
+        cpuDemand: 1.10,
+        gpuDemand: 1.03,
+        label: "Gaming & Streaming",
+        cpuWeight: 0.50,
+        gpuWeight: 0.50
+      },
+      editing: {
+        cpuDemand: 1.09,
+        gpuDemand: 1.06,
+        label: "Video Editing",
+        cpuWeight: 0.56,
+        gpuWeight: 0.44
+      },
+      productivity: {
+        cpuDemand: 1.12,
+        gpuDemand: 0.84,
+        label: "Productivity",
+        cpuWeight: 0.68,
+        gpuWeight: 0.32
+      }
+    };
+
+    const fpsProfile: Record<string, { cpu: number; gpu: number }> = {
+      "60": { cpu: 0.94, gpu: 0.98 },
+      "75": { cpu: 0.98, gpu: 1.00 },
+      "120": { cpu: 1.07, gpu: 1.03 },
+      "144": { cpu: 1.13, gpu: 1.05 },
+      "165": { cpu: 1.18, gpu: 1.07 },
+      "240": { cpu: 1.31, gpu: 1.10 }
+    };
+
+    const resolutionFactors =
+      resolutionProfile[resolution as keyof typeof resolutionProfile] ||
+      resolutionProfile["1080p"];
+
+    const purposeFactors =
+      purposeProfile[purpose as keyof typeof purposeProfile] ||
+      purposeProfile.gaming;
+
+    const fpsFactors = fps
+      ? fpsProfile[fps] || { cpu: 1, gpu: 1 }
+      : { cpu: 1, gpu: 1 };
+
+    let cpuEffective =
+      cpuScore /
+      (resolutionFactors.cpuDemand *
+        purposeFactors.cpuDemand *
+        fpsFactors.cpu);
+
+    let gpuEffective =
+      gpuScore /
+      (resolutionFactors.gpuDemand *
+        purposeFactors.gpuDemand *
+        fpsFactors.gpu);
+
+    let ramPenalty = 0;
+
+    if (ram === "8") {
+      cpuEffective *= 0.94;
+      gpuEffective *= 0.98;
+      ramPenalty = 5;
+    } else if (ram === "16") {
+      ramPenalty = 1;
+    }
+
+    let bottleneck = 0;
+    let cpuIsLimit = false;
+    let gpuIsLimit = false;
+
+    if (purpose === "gaming" && cpuPairingIndex && gpuPairingIndex) {
+      const gamingAnalysis = gamingResolutionAnalysis(
+        cpuPairingIndex,
+        gpuPairingIndex,
+        fps,
+        resolution as "1080p" | "1440p" | "4k",
+        gpuFps1080,
+        gpuFps1440,
+        gpuFps4k
+      );
+
+      bottleneck = gamingAnalysis.mismatch;
+      cpuIsLimit = gamingAnalysis.cpuLimit;
+      gpuIsLimit = gamingAnalysis.gpuLimit;
+    } else {
+      const strongerEffective = Math.max(cpuEffective, gpuEffective);
+      const weakerEffective = Math.min(cpuEffective, gpuEffective);
+
+      const rawGap =
+        strongerEffective > 0
+          ? ((strongerEffective - weakerEffective) / strongerEffective) * 100
+          : 0;
+
+      bottleneck = Math.round(rawGap * 0.55);
+      bottleneck = clamp(Math.max(1, bottleneck), 1, 45);
+
+      cpuIsLimit = cpuEffective < gpuEffective;
+      gpuIsLimit = gpuEffective < cpuEffective;
+    }
+
+    const balanced = bottleneck <= 5;
+
+    const balanceQuality = clamp(100 - bottleneck * 1.45, 35, 99);
+
+    const componentQuality =
+      cpuScore * purposeFactors.cpuWeight +
+      gpuScore * purposeFactors.gpuWeight;
+
+    let buildScore = Math.round(
+      componentQuality * 0.78 +
+      balanceQuality * 0.22 -
+      ramPenalty
+    );
+
+    // High target FPS and 4K expose absolute capability, not just balance.
+    if (fps && Number(fps) >= 165 && componentQuality < 82) {
+      buildScore -= 3;
+    }
+
+    if (resolution === "4k" && gpuScore < 82) {
+      buildScore -= 4;
+    }
+
+    buildScore = clamp(buildScore, 45, 98);
+
+    const matchLabel = getMatchLabel(bottleneck);
+    const buildGrade = getBuildGrade(buildScore);
+
+    /*
+      Estimate confidence describes the evidence behind this exact result.
+      It is separate from build quality and from the bottleneck percentage.
+    */
+    const cpuOption = cpuSelect.selectedOptions?.[0];
+    const gpuOption = gpuSelect.selectedOptions?.[0];
+
+    const cpuYear = Number(cpuOption?.dataset.year || 0);
+    const gpuYear = Number(gpuOption?.dataset.year || 0);
+
+    const cpuBenchmarkStatus =
+      cpuOption?.dataset.benchmarkStatus || "";
+    const cpuPairingStatus =
+      cpuOption?.dataset.pairingStatus || "";
+
+    const gpuBenchmarkStatus =
+      gpuOption?.dataset.benchmarkStatus || "";
+    const gpuPairingStatus =
+      gpuOption?.dataset.pairingStatus || "";
+
+    const hasNativeGpuScaling =
+      gpuFps1080 > 0 &&
+      gpuFps1440 > 0 &&
+      gpuFps4k > 0 &&
+      gpuBenchmarkStatus === "validated";
+
+    const confidence = buildEstimateConfidence({
+      cpuBenchmarkStatus,
+      cpuPairingStatus,
+      gpuBenchmarkStatus,
+      gpuPairingStatus,
+      cpuYear,
+      gpuYear,
+      purpose,
+      bottleneck,
+      fps,
+      ram,
+      hasNativeGpuScaling
+    });
+
+    const confidenceScore = confidence.score;
+
+    const cpuName = selectedName(cpuSelect);
+    const gpuName = selectedName(gpuSelect);
+
+    let title = "";
+    let type = "";
+    let summary = "";
+    let upgrade = "";
+
+    if (balanced) {
+      title = purpose === "gaming" ? "Well-Matched Gaming Pairing" : "Excellent Match";
+      type =
+        purpose === "gaming"
+          ? "No significant CPU-side constraint detected"
+          : "No significant CPU–GPU mismatch detected";
+      summary =
+        purpose === "gaming"
+          ? `At ${resolutionFactors.label}, the benchmark-calibrated pairing model does not detect a meaningful CPU–GPU mismatch. ` +
+            `The estimated mismatch is ${bottleneck}%, though the limiting component can still vary by game, settings, and target frame rate.`
+          : `The CPU and GPU are closely matched for ${purposeFactors.label.toLowerCase()} at ${resolutionFactors.label}. ` +
+            `The estimated ${bottleneck}% mismatch is small enough that the limiting component will often change from one application to another.`;
+
+      upgrade =
+        buildScore >= 84
+          ? "There is no urgent CPU-or-GPU upgrade priority. Upgrade only if you are targeting a higher resolution, substantially higher frame rate, or a heavier workload."
+          : "The pairing itself is balanced, but both components are in a lower performance tier. A future platform-wide upgrade may make more sense than replacing only one part.";
+    } else if (cpuIsLimit) {
+      title = "CPU-Limited Pairing";
+      type = "The processor is the more likely limiting component";
+      summary =
+        `The processor has less relative headroom than the graphics card under these settings. ` +
+        `The estimated ${bottleneck}% mismatch is most likely to appear in CPU-heavy games, simulation workloads, and high-refresh targets.`;
+
+      upgrade =
+        bottleneck <= 10
+          ? "This remains a strong pairing. A CPU upgrade is optional and mainly worthwhile for high-refresh gaming or processor-heavy applications."
+          : "The CPU is the first component to investigate if you want to reduce the mismatch. Check motherboard and socket compatibility before choosing a replacement.";
+    } else {
+      title = "GPU-Limited Pairing";
+      type = "The graphics card is the more likely limiting component";
+      summary =
+        `The graphics card has less relative headroom than the processor under these settings. ` +
+        `The estimated ${bottleneck}% mismatch is most likely to appear as resolution, visual quality, rendering load, or ray tracing demand increases.`;
+
+      upgrade =
+        bottleneck <= 10
+          ? "This remains a strong pairing. A GPU upgrade is optional and would mainly help with higher resolutions, heavier graphics settings, or higher frame rates."
+          : "The GPU is the clearest upgrade target if you want more performance at this resolution and workload.";
+    }
+
+    const fpsDescription = fps
+      ? `${fps} FPS target included`
+      : "No FPS target selected";
+
+    if (resultTitle) resultTitle.textContent = title;
+    if (resultPair) resultPair.textContent = `${cpuName} + ${gpuName}`;
+    if (resultPercentage) resultPercentage.textContent = `${bottleneck}%`;
+    if (resultType) resultType.textContent = type;
+    if (resultText) resultText.textContent = summary;
+    if (matchScore) matchScore.textContent = `${buildScore}/100`;
+    if (overallMatch) overallMatch.textContent = matchLabel;
+    if (resultResolution) resultResolution.textContent = resolutionFactors.label;
+    if (resultPurpose) resultPurpose.textContent = purposeFactors.label;
+    if (resultConfidence) {
+      resultConfidence.textContent = confidence.label;
+    }
+
+    if (resultRange) {
+      resultRange.textContent =
+        bottleneck === 0
+          ? `Expected range: 0–${confidence.high}% · varies by game`
+          : `Expected range: ${confidence.low}–${confidence.high}% · varies by game`;
+    }
+
+    if (methodCpuScore) {
+      methodCpuScore.textContent =
+        purpose === "gaming"
+          ? `${cpuPairingIndex.toFixed(1)} CPU pairing index`
+          : `${Math.round(cpuScore)}/100 workload profile`;
+    }
+
+    if (methodGpuScore) {
+      methodGpuScore.textContent =
+        purpose === "gaming" && gpuPairingIndex
+          ? `${gpuPairingIndex.toFixed(1)} GPU pairing index`
+          : `${Math.round(gpuScore)}/100 workload profile`;
+    }
+
+    if (methodResolution) {
+      const cpuPct = Math.round((resolutionFactors.cpuDemand - 1) * 100);
+      const gpuPct = Math.round((resolutionFactors.gpuDemand - 1) * 100);
+
+      const cpuText = cpuPct === 0 ? "CPU neutral" : `CPU ${cpuPct > 0 ? "+" : ""}${cpuPct}% demand`;
+      const gpuText = gpuPct === 0 ? "GPU neutral" : `GPU ${gpuPct > 0 ? "+" : ""}${gpuPct}% demand`;
+
+      methodResolution.textContent = `${cpuText} · ${gpuText}`;
+    }
+
+    if (methodWorkload) {
+      methodWorkload.textContent =
+        `${purposeFactors.label} · CPU ${Math.round(purposeFactors.cpuWeight * 100)}% / GPU ${Math.round(purposeFactors.gpuWeight * 100)}%`;
+    }
+
+    if (methodFps) {
+      methodFps.textContent = fps
+        ? `${fps} FPS target applied`
+        : "No target FPS supplied";
+    }
+
+    if (methodRam) {
+      methodRam.textContent = ram
+        ? ram === "8"
+          ? "8 GB penalty applied"
+          : `${ram} GB selected`
+        : "No RAM context supplied";
+    }
+
+    if (confidenceSummary) {
+      confidenceSummary.textContent = confidence.label;
+    }
+
+    if (confidencePoints) {
+      confidencePoints.innerHTML = "";
+
+      const addPoint = (
+        textValue: string,
+        warning = false
+      ) => {
+        const item = document.createElement("div");
+        item.className =
+          `confidence-point${warning ? " warning" : ""}`;
+        item.textContent = textValue;
+        confidencePoints.appendChild(item);
+      };
+
+      const cpuEvidenceText =
+        cpuBenchmarkStatus === "validated"
+          ? "CPU gaming data is directly benchmark-calibrated"
+          : cpuBenchmarkStatus === "derived"
+            ? "CPU gaming data is derived from a validated sibling"
+            : cpuPairingStatus.includes("provisional-calibrated")
+              ? "CPU pairing data is calibrated but still provisional"
+              : "CPU gaming data is provisional";
+
+      const gpuEvidenceText =
+        gpuBenchmarkStatus === "validated"
+          ? "GPU raster data is directly benchmark-calibrated"
+          : gpuBenchmarkStatus === "legacy-bridged"
+            ? "GPU data comes from a measured legacy benchmark bridge"
+            : "GPU gaming data is provisional";
+
+      addPoint(cpuEvidenceText, cpuBenchmarkStatus === "provisional");
+      addPoint(gpuEvidenceText, gpuBenchmarkStatus === "provisional");
+
+      if (hasNativeGpuScaling) {
+        addPoint("Native 1080p, 1440p, and 4K GPU scaling is available");
+      } else {
+        addPoint("Native three-resolution GPU scaling is incomplete", true);
+      }
+
+      if (fps) {
+        addPoint(`Target FPS (${fps}) is included`);
+      } else {
+        addPoint(
+          "Target FPS was not supplied; high-refresh behavior may differ",
+          true
+        );
+      }
+
+      if (ram) {
+        addPoint(`RAM context (${ram} GB) is included`);
+      } else {
+        addPoint("RAM amount was not supplied", true);
+      }
+
+      addPoint(`Expected model range: ${confidence.low}–${confidence.high}%`);
+
+      addPoint(
+        "Individual games, settings, drivers, and background load can change the limiting component",
+        true
+      );
+    }
+    if (upgradeText) upgradeText.textContent = upgrade;
+
+    if (experienceText) {
+      const limitingHeadroom = Math.min(cpuEffective, gpuEffective);
+
+      experienceText.textContent = getExperience(
+        limitingHeadroom,
+        resolution,
+        purpose
+      );
+    }
+
+    if (ramText) ramText.textContent = getRamMessage(ram);
+    if (fpsText) fpsText.textContent = fpsDescription;
+
+    if (meterRing) {
+      const angle = clamp(bottleneck, 0, 100) * 3.6;
+      meterRing.style.setProperty("--meter-angle", `${angle}deg`);
+    }
+
+    if (matchBadge) {
+      matchBadge.setAttribute(
+        "data-match",
+        matchLabel.toLowerCase().replace(" ", "-")
+      );
+    }
+
+    const cpuDisplay = clamp(Math.round(cpuScore), 0, 100);
+    const gpuDisplay = clamp(Math.round(gpuScore), 0, 100);
+
+    if (cpuBar) cpuBar.style.width = `${cpuDisplay}%`;
+    if (gpuBar) gpuBar.style.width = `${gpuDisplay}%`;
+    if (cpuBarValue) cpuBarValue.textContent = `${cpuDisplay}/100`;
+    if (gpuBarValue) gpuBarValue.textContent = `${gpuDisplay}/100`;
+    if (reportGrade) {
+      reportGrade.textContent = `${buildGrade} · ${buildScore}`;
+    }
+
+    const gamingCombined = Math.round(
+      cpuGaming * 0.38 + cpuSingle * 0.10 + gpuGaming * 0.52
+    );
+
+    const streamingCombined = Math.round(
+      cpuMulti * 0.34 +
+      cpuGaming * 0.18 +
+      gpuRender * 0.18 +
+      gpuGaming * 0.30
+    );
+
+    const editingCombined = Math.round(
+      cpuProductivity * 0.32 +
+      cpuMulti * 0.25 +
+      gpuRender * 0.33 +
+      gpuGaming * 0.10
+    );
+
+    if (gamingRating) gamingRating.textContent = qualitative(gamingCombined);
+    if (streamingRating) {
+      streamingRating.textContent = qualitative(streamingCombined);
+    }
+    if (editingRating) editingRating.textContent = qualitative(editingCombined);
+    if (rayTracingRating) {
+      rayTracingRating.textContent = qualitative(gpuRayTracing);
+    }
+
+    if (reportStrengths) {
+      if (balanced && buildScore >= 84) {
+        reportStrengths.textContent =
+          `This is a well-matched ${purposeFactors.label.toLowerCase()} build. ` +
+          `Its strongest advantage is balance: neither major component is dramatically out of place for ${resolutionFactors.label}.`;
+      } else if (cpuIsLimit) {
+        reportStrengths.textContent =
+          `The GPU retains useful graphics headroom, so visual quality and resolution can often be increased before the graphics card becomes the primary constraint.`;
+      } else {
+        reportStrengths.textContent =
+          `The CPU retains useful processing headroom, which is helpful for background tasks, game logic, streaming support, and future GPU upgrades.`;
+      }
+    }
+
+    if (reportWatch) {
+      if (balanced) {
+        reportWatch.textContent =
+          buildScore >= 84
+            ? "No major pairing issue stands out. The specific game, application, graphics settings, and target frame rate will matter more than the small estimated mismatch."
+            : "The components are balanced with each other, but absolute performance may still require reduced settings in demanding modern workloads.";
+      } else if (cpuIsLimit) {
+        reportWatch.textContent =
+          "High-refresh gaming, simulation-heavy titles, large crowds, strategy games, and processor-heavy productivity work are the most likely places to expose the CPU limit.";
+      } else {
+        reportWatch.textContent =
+          "Higher resolutions, ultra settings, ray tracing, heavy rendering, and VRAM-intensive workloads are the most likely places to expose the GPU limit.";
+      }
+    }
+
+    if (upgradeSuggestions) {
+      upgradeSuggestions.innerHTML = "";
+
+      const mildMismatch = bottleneck <= 10;
+      const highQualityBalanced = balanced && buildScore >= 84;
+
+      let suggestions: string[] = [];
+      let heading = "No urgent upgrade";
+
+      if (highQualityBalanced) {
+        heading = "No urgent upgrade";
+      } else if (balanced) {
+        heading = "Future performance upgrades";
+        suggestions =
+          gpuScore <= cpuScore
+            ? topUpgradeNames(
+                gpuSelect,
+                purpose === "gaming" ? gpuPairingIndex : gpuGaming,
+                purpose === "gaming" ? "pairingIndex" : "gaming",
+                3,
+                false
+              )
+            : topUpgradeNames(
+                cpuSelect,
+                purpose === "gaming" ? cpuPairingIndex : cpuGaming,
+                purpose === "gaming" ? "pairingIndex" : "gaming",
+                3,
+                true
+              );
+      } else if (cpuIsLimit) {
+        heading = mildMismatch
+          ? "Optional CPU upgrades"
+          : "CPU upgrade candidates";
+
+        suggestions = topUpgradeNames(
+          cpuSelect,
+          purpose === "gaming" ? cpuPairingIndex : cpuGaming,
+          purpose === "gaming" ? "pairingIndex" : "gaming",
+          3,
+          true
+        );
+      } else {
+        heading = mildMismatch
+          ? "Optional GPU upgrades"
+          : "GPU upgrade candidates";
+
+        suggestions = topUpgradeNames(
+          gpuSelect,
+          purpose === "gaming" ? gpuPairingIndex : gpuGaming,
+          purpose === "gaming" ? "pairingIndex" : "gaming",
+          3,
+          false
+        );
+      }
+
+      if (upgradeHeading) upgradeHeading.textContent = heading;
+
+      if (highQualityBalanced) {
+        const pill = document.createElement("span");
+        pill.className = "upgrade-pill";
+        pill.textContent = "Keep this pairing";
+        upgradeSuggestions.appendChild(pill);
+      } else if (suggestions.length) {
+        suggestions.forEach((name) => {
+          const pill = document.createElement("span");
+          pill.className = "upgrade-pill";
+          pill.textContent = name;
+          upgradeSuggestions.appendChild(pill);
+        });
+      } else {
+        const pill = document.createElement("span");
+        pill.className = "upgrade-pill";
+        pill.textContent = "No clear step-up in the current database";
+        upgradeSuggestions.appendChild(pill);
+      }
+    }
+
+    const analysis1080 = resolutionAnalysis(
+      cpuScore,
+      gpuScore,
+      purpose,
+      fps,
+      "1080p",
+      cpuPairingIndex,
+      gpuPairingIndex,
+      gpuFps1080,
+      gpuFps1440,
+      gpuFps4k
+    );
+    const analysis1440 = resolutionAnalysis(
+      cpuScore,
+      gpuScore,
+      purpose,
+      fps,
+      "1440p",
+      cpuPairingIndex,
+      gpuPairingIndex,
+      gpuFps1080,
+      gpuFps1440,
+      gpuFps4k
+    );
+    const analysis4k = resolutionAnalysis(
+      cpuScore,
+      gpuScore,
+      purpose,
+      fps,
+      "4k",
+      cpuPairingIndex,
+      gpuPairingIndex,
+      gpuFps1080,
+      gpuFps1440,
+      gpuFps4k
+    );
+
+    setResolutionCard("1080p", analysis1080, resolution);
+    setResolutionCard("1440p", analysis1440, resolution);
+    setResolutionCard("4k", analysis4k, resolution);
+
+    if (actionList) {
+      actionList.innerHTML = "";
+
+      const actions: { title: string; text: string }[] = [];
+
+      if (balanced) {
+        actions.push({
+          title: "Keep the current CPU–GPU pairing",
+          text:
+            "The selected components are closely matched for the chosen settings, so there is no urgent need to replace either part."
+        });
+      } else if (cpuIsLimit) {
+        actions.push({
+          title: "Prioritize the CPU only if the limitation matters to you",
+          text:
+            "A faster processor is most useful for high-refresh gaming, simulation-heavy titles, and processor-heavy applications."
+        });
+      } else {
+        actions.push({
+          title: "Prioritize the GPU for higher visual performance",
+          text:
+            "A faster graphics card is the clearest route to higher resolutions, heavier graphics settings, ray tracing, and rendering performance."
+        });
+      }
+
+      if (analysis4k.gpuLimit && analysis4k.mismatch > 10) {
+        actions.push({
+          title: "Treat 4K as a GPU-heavy target",
+          text:
+            "The graphics card becomes more important at 3840 × 2160. Lowering graphics settings or upgrading the GPU can reduce that pressure."
+        });
+      }
+
+      if (!ram) {
+        actions.push({
+          title: "Add your RAM amount for a more complete estimate",
+          text:
+            "Memory capacity can affect multitasking and demanding workloads, so selecting RAM improves the context of the result."
+        });
+      }
+
+      if (!fps && purpose === "gaming") {
+        actions.push({
+          title: "Choose a target FPS if high refresh rate matters",
+          text:
+            "A 60 FPS target and a 240 FPS target can stress the CPU very differently. Adding a target helps the calculator model that demand."
+        });
+      }
+
+      actions.slice(0, 4).forEach((action, index) => {
+        const item = document.createElement("div");
+        item.className = "action-item";
+
+        const icon = document.createElement("span");
+        icon.className = "action-icon";
+        icon.textContent = String(index + 1);
+
+        const copy = document.createElement("div");
+        const heading = document.createElement("strong");
+        heading.textContent = action.title;
+        const paragraph = document.createElement("p");
+        paragraph.textContent = action.text;
+
+        copy.appendChild(heading);
+        copy.appendChild(paragraph);
+        item.appendChild(icon);
+        item.appendChild(copy);
+        actionList.appendChild(item);
+      });
+    }
+
+    const ramGuide = ramGuidance(purpose);
+
+    if (ramMinimum) ramMinimum.textContent = ramGuide.minimum;
+    if (ramRecommended) ramRecommended.textContent = ramGuide.recommended;
+    if (ramHeavy) ramHeavy.textContent = ramGuide.heavy;
+    if (ramMinimumText) ramMinimumText.textContent = ramGuide.minimumText;
+    if (ramRecommendedText) ramRecommendedText.textContent = ramGuide.recommendedText;
+    if (ramHeavyText) ramHeavyText.textContent = ramGuide.heavyText;
+
+    if (shoppingRamName) {
+      shoppingRamName.textContent = `${ramGuide.recommended} DDR4 or DDR5 memory`;
+    }
+
+    const ramSearch = `${ramGuide.recommended} desktop RAM kit`;
+    if (ramAmazonLink) ramAmazonLink.href = retailerUrl("amazon", ramSearch);
+    if (ramNeweggLink) ramNeweggLink.href = retailerUrl("newegg", ramSearch);
+
+    if (shoppingCpuName) shoppingCpuName.textContent = cpuName;
+    if (shoppingGpuName) shoppingGpuName.textContent = gpuName;
+    if (cpuAmazonLink) cpuAmazonLink.href = retailerUrl("amazon", cpuName);
+    if (cpuNeweggLink) cpuNeweggLink.href = retailerUrl("newegg", cpuName);
+    if (gpuAmazonLink) gpuAmazonLink.href = retailerUrl("amazon", gpuName);
+    if (gpuNeweggLink) gpuNeweggLink.href = retailerUrl("newegg", gpuName);
+
+    if (upgradeCardGrid) {
+      upgradeCardGrid.innerHTML = "";
+
+      let candidates: ReturnType<typeof getUpgradeCandidates> = [];
+      let targetLabel = "";
+
+      if (!balanced && cpuIsLimit) {
+        candidates = getUpgradeCandidates(
+          cpuSelect,
+          purpose === "gaming" ? cpuPairingIndex : cpuGaming,
+          purpose === "gaming" ? "pairingIndex" : "gaming",
+          2,
+          true
+        );
+        targetLabel = "CPU";
+      } else if (!balanced && gpuIsLimit) {
+        candidates = getUpgradeCandidates(
+          gpuSelect,
+          purpose === "gaming" ? gpuPairingIndex : gpuGaming,
+          purpose === "gaming" ? "pairingIndex" : "gaming",
+          2,
+          false
+        );
+        targetLabel = "GPU";
+      } else if (analysis4k.gpuLimit && analysis4k.mismatch > 8) {
+        candidates = getUpgradeCandidates(
+          gpuSelect,
+          purpose === "gaming" ? gpuPairingIndex : gpuGaming,
+          purpose === "gaming" ? "pairingIndex" : "gaming",
+          2,
+          false
+        );
+        targetLabel = "GPU for higher resolutions";
+      }
+
+      if (recommendedUpgradeTitle) {
+        recommendedUpgradeTitle.textContent =
+          candidates.length
+            ? `${targetLabel} Upgrade Options`
+            : "No Urgent Upgrade Required";
+      }
+
+      if (recommendedUpgradeIntro) {
+        recommendedUpgradeIntro.textContent =
+          candidates.length
+            ? "These are nearby higher-performing options from the current database. The percentage is a relative internal score increase, not guaranteed FPS."
+            : "This pairing does not currently show a strong enough mismatch to justify recommending a replacement purely for balance.";
+      }
+
+      if (!candidates.length) {
+        const placeholder = document.createElement("div");
+        placeholder.className = "upgrade-card-placeholder";
+        placeholder.textContent =
+          "Keep this pairing for now. Upgrade when your target resolution, frame rate, or workload demands more performance.";
+        upgradeCardGrid.appendChild(placeholder);
+      } else {
+        candidates.forEach((candidate, index) => {
+          const card = document.createElement("article");
+          card.className = "upgrade-card";
+
+          const kicker = document.createElement("span");
+          kicker.className = "upgrade-card-kicker";
+          kicker.textContent = index === 0 ? "BEST NEXT STEP" : "ALTERNATIVE";
+
+          const heading = document.createElement("h5");
+          heading.textContent = candidate.name;
+
+          const improvement = document.createElement("div");
+          improvement.className = "upgrade-improvement";
+          improvement.textContent =
+            purpose === "gaming"
+              ? `≈ +${candidate.relativeGain}% benchmark-reference headroom`
+              : `≈ +${candidate.relativeGain}% relative workload profile`;
+
+          const note = document.createElement("p");
+          note.textContent =
+            "Check platform compatibility, physical dimensions, power requirements, and local pricing before purchasing.";
+
+          const actions = document.createElement("div");
+          actions.className = "upgrade-actions";
+
+          const amazon = document.createElement("a");
+          amazon.href = retailerUrl("amazon", candidate.name);
+          amazon.target = "_blank";
+          amazon.rel = "noopener noreferrer";
+          amazon.textContent = "Search Amazon ↗";
+
+          const newegg = document.createElement("a");
+          newegg.href = retailerUrl("newegg", candidate.name);
+          newegg.target = "_blank";
+          newegg.rel = "noopener noreferrer";
+          newegg.textContent = "Search Newegg ↗";
+
+          actions.appendChild(amazon);
+          actions.appendChild(newegg);
+
+          card.appendChild(kicker);
+          card.appendChild(heading);
+          card.appendChild(improvement);
+          card.appendChild(note);
+          card.appendChild(actions);
+          upgradeCardGrid.appendChild(card);
+        });
+      }
+    }
+
+    resultCard?.classList.add("show");
+
+    if (resultCard) {
+      requestAnimationFrame(() => {
+        const y =
+          resultCard.getBoundingClientRect().top +
+          window.pageYOffset -
+          24;
+
+        window.scrollTo({
+          top: y,
+          behavior: "smooth"
+        });
+      });
+    }
+  });
+</script>
+
