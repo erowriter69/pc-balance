@@ -1,0 +1,24 @@
+{
+  "name": "PC Balance \u2013 CPU & GPU Bottleneck Calculator",
+  "short_name": "PC Balance",
+  "description": "Benchmark-informed CPU and GPU bottleneck estimates with resolution, workload, confidence, and upgrade guidance.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07101f",
+  "theme_color": "#07101f",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

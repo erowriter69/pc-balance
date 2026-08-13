@@ -1,0 +1,332 @@
+---
+import cpus from "../data/cpus.json";
+import gpus from "../data/gpus.json";
+import { SITE, absoluteUrl } from "../site-config";
+
+const title = "Bottleneck Calculator Methodology & Data Sources – PC Balance";
+const description = "See how PC Balance estimates CPU and GPU bottlenecks, handles resolution and confidence, validates the model, and separates direct benchmark data from provisional coverage.";
+const canonicalUrl = absoluteUrl("/methodology/");
+const matrixChecks = cpus.length * gpus.length * 3;
+const provisionalCpuCount = cpus.filter((cpu) => String(cpu.pairingIndexStatus || "").includes("provisional")).length;
+const validatedGpuCount = gpus.filter((gpu) => gpu.rasterBenchmarkStatus === "validated").length;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": `${canonicalUrl}#methodology`,
+      url: canonicalUrl,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": `${absoluteUrl("/")}#website`,
+        name: SITE.name,
+        url: absoluteUrl("/"),
+      },
+        about: [
+          { "@type": "Thing", name: "CPU bottleneck estimation" },
+          { "@type": "Thing", name: "GPU bottleneck estimation" },
+          { "@type": "Thing", name: "PC hardware benchmark calibration" },
+        ],
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+      dateModified: SITE.lastReviewed,
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "PC Balance",
+          item: absoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Methodology",
+          item: canonicalUrl,
+        },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <meta name="twitter:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>PC Balance</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">PC Balance</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">Methodology</span>
+        </nav>
+        <span class="eyebrow">METHODOLOGY & SOURCES</span>
+        <h1>How PC Balance estimates a bottleneck</h1>
+        <p class="lede">
+          A bottleneck percentage is not an industry-standard measurement. PC Balance treats it as a comparative estimate: which component is more likely to limit the selected workload, how large the mismatch appears, and how much confidence the available data supports.
+        </p>
+        <div class="meta-row">
+          <span class="meta-chip">Engine v3.2</span>
+          <span class="meta-chip">{cpus.length} CPUs</span>
+          <span class="meta-chip">{gpus.length} GPUs</span>
+          <span class="meta-chip">{matrixChecks.toLocaleString()} matrix checks</span>
+        </div>
+
+        <div class="content-grid">
+          <section class="card callout">
+            <h2>The short version</h2>
+            <p>
+              The gaming model compares normalized CPU and GPU pairing strength on a common internal scale, applies resolution behavior, then adjusts context for target FPS. A dead zone prevents tiny score differences from becoming fake bottlenecks. Separate workload profiles are used for streaming, video editing, and productivity.
+            </p>
+            <p>
+              The displayed result is deliberately described as an <strong>estimate</strong>, and the confidence layer widens the expected range when the underlying hardware data is weaker.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Inputs the model uses</h2>
+            <div class="two-col">
+              <div>
+                <h3>Component profiles</h3>
+                <ul>
+                  <li>CPU gaming and pairing strength</li>
+                  <li>CPU single-core and multi-core context</li>
+                  <li>GPU raster gaming strength</li>
+                  <li>GPU render and ray-tracing profiles where available</li>
+                </ul>
+              </div>
+              <div>
+                <h3>User context</h3>
+                <ul>
+                  <li>1080p, 1440p, or 4K resolution</li>
+                  <li>Gaming, streaming, editing, or productivity workload</li>
+                  <li>Optional target FPS</li>
+                  <li>Optional RAM capacity</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>How resolution is handled</h2>
+            <p>
+              Resolution does not simply add or subtract a fixed percentage. For gaming, PC Balance uses the selected GPU's stored native-resolution scaling when that benchmark coverage exists. Higher resolutions generally increase GPU rendering pressure; lower resolutions and high frame-rate targets can expose CPU limits more often.
+            </p>
+            <p>
+              A contextual resolution adjustment can reduce an existing mismatch toward balanced, but it is not allowed to invent a new opposite-side bottleneck by itself.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Confidence and expected range</h2>
+            <p>
+              Not every processor and graphics card has equally strong modern benchmark coverage. The confidence engine scores the evidence behind the selected CPU and GPU, whether native multi-resolution GPU data is available, how old the hardware is, and whether optional FPS/RAM context was supplied.
+            </p>
+            <ul>
+              <li><strong>Validated:</strong> directly calibrated against a common benchmark reference.</li>
+              <li><strong>Derived:</strong> based on a closely related validated sibling or family reference.</li>
+              <li><strong>Legacy bridged:</strong> measured in an older benchmark hierarchy and mapped into the current comparison domain.</li>
+              <li><strong>Provisional calibrated:</strong> useful coverage with explicitly lower confidence while direct same-suite data is unavailable.</li>
+            </ul>
+            <p>
+              The current CPU database includes {provisionalCpuCount} provisional-calibrated entries; the GPU database includes {validatedGpuCount} cards with directly validated raster status. Those labels are used by the confidence system instead of being hidden from the user.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Validation process</h2>
+            <p>
+              Every engine revision is checked against known anchor pairings and against the full hardware matrix. With the current database, that means {matrixChecks.toLocaleString()} CPU/GPU/resolution checks for non-finite values, impossible percentage ranges, and resolution-only side flips, plus targeted regression cases that previously exposed bugs.
+            </p>
+            <p class="notice">
+              Passing the matrix tests means the model is internally consistent. It does not mean every game will produce the same percentage; game engines, settings, drivers, cooling, background tasks, and memory configuration still matter.
+            </p>
+          </section>
+
+          <section class="card" id="sources">
+            <h2>Public reference sources</h2>
+            <p>
+              These sources inform hardware calibration, scaling behavior, specifications, or model sanity checks. PC Balance does not copy another calculator's proprietary formula.
+            </p>
+            <div class="source-list">
+              <a class="source-item" href="https://www.tomshardware.com/reviews/cpu-hierarchy,4312.html" target="_blank" rel="noopener noreferrer">
+                <strong>Tom's Hardware CPU Benchmarks and Hierarchy</strong>
+                <span>Common gaming benchmark hierarchy used for modern CPU calibration references.</span>
+              </a>
+              <a class="source-item" href="https://www.tomshardware.com/reviews/gpu-hierarchy,4388.html" target="_blank" rel="noopener noreferrer">
+                <strong>Tom's Hardware GPU Benchmarks and Hierarchy</strong>
+                <span>Native-resolution GPU performance references and historical hierarchy coverage.</span>
+              </a>
+              <a class="source-item" href="https://www.cpubenchmark.net/CPU_mega_page.html" target="_blank" rel="noopener noreferrer">
+                <strong>PassMark CPU Mega List</strong>
+                <span>Broad processor coverage used as a secondary reference for older or missing CPU families.</span>
+              </a>
+              <a class="source-item" href="https://www.techspot.com/review/1968-ryzen-3600-vs-2600-gaming-scaling/" target="_blank" rel="noopener noreferrer">
+                <strong>TechSpot / Hardware Unboxed CPU–GPU scaling analysis</strong>
+                <span>Useful sanity reference for how CPU differences change with GPU strength and resolution.</span>
+              </a>
+              <a class="source-item" href="https://www.intel.com/content/www/us/en/gaming/resources/what-is-bottlenecking-my-pc.html" target="_blank" rel="noopener noreferrer">
+                <strong>Intel: What Is Bottlenecking My PC?</strong>
+                <span>General explanation of CPU/GPU workload relationships and why the limiting part varies by task.</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="card" id="limitations">
+            <h2>Important limitations</h2>
+            <ul>
+              <li>There is no universal industry-standard bottleneck percentage.</li>
+              <li>Game-specific CPU behavior can differ substantially even at the same resolution.</li>
+              <li>Ray tracing, upscaling, frame generation, mods, and graphics presets can change the limiting side.</li>
+              <li>Thermal throttling, power limits, drivers, BIOS settings, and background software are outside this static model.</li>
+              <li>Older provisional hardware should be interpreted with a wider confidence range.</li>
+            </ul>
+          </section>
+
+          <section class="card" id="shopping-disclosure">
+            <h2>Shopping and retailer disclosure</h2>
+            <p>
+              Retailer buttons on PC Balance currently open normal search-result pages for the selected or recommended hardware. They do not represent live prices, stock, guaranteed compatibility, or a claim that a retailer is the best place to buy. If affiliate relationships are introduced later, qualifying links will be identified clearly and this disclosure will be updated.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Review policy</h2>
+            <p>
+              Methodology changes are regression-tested before deployment. The public methodology date is updated when the model or data policy receives a meaningful review rather than automatically changing on every site build.
+            </p>
+            <p><strong>Last reviewed:</strong> {SITE.lastReviewedHuman}</p>
+          </section>
+        </div>
+
+        <a class="back" href="/">← Back to the bottleneck calculator</a>
+      </main>
+      <footer>
+        <div class="footer-inner">
+          <span>© {new Date().getFullYear()} PC Balance</span>
+          <div class="footer-links">
+            <a href="/">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/terms/">Terms</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link {
+    position: fixed; top: 12px; left: 12px; z-index: 9999; padding: 10px 14px;
+    border-radius: 10px; background: #fff; color: #07101f; font-weight: 800;
+    transform: translateY(-160%); transition: transform .18s ease;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  .shell { min-height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(37,99,235,.12), transparent 34%), linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(7,16,31,.9); }
+  .header-inner { width: min(1080px,92%); min-height: 72px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover { color:#fff; }
+  main { width:min(960px,92%); margin:0 auto; padding:72px 0 90px; }
+  .eyebrow { color:#78aaff; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.3rem,6vw,4rem); line-height:1.05; letter-spacing:-.045em; }
+  .lede { max-width:780px; margin:0; color:#a8b7cb; font-size:1.05rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .content-grid { display:grid; gap:18px; margin-top:42px; }
+  .card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .card h2 { margin:0 0 12px; font-size:1.45rem; letter-spacing:-.025em; }
+  .card h3 { margin:22px 0 8px; font-size:1.05rem; }
+  .card p { margin:10px 0 0; color:#9eadc2; }
+  .card ul, .card ol { margin:12px 0 0; padding-left:22px; color:#9eadc2; }
+  .card li + li { margin-top:8px; }
+  .card a { color:#78aaff; font-weight:700; }
+  .two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .source-list { display:grid; gap:12px; margin-top:16px; }
+  .source-item { padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:14px; background:rgba(5,16,31,.55); }
+  .source-item strong { display:block; margin-bottom:5px; }
+  .source-item span { color:#8193aa; font-size:.86rem; }
+  .notice { padding:15px 16px; border-left:3px solid #78aaff; border-radius:0 12px 12px 0; background:rgba(37,99,235,.09); color:#b7c6d8; }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  footer { border-top:1px solid rgba(255,255,255,.07); }
+  .footer-inner { width:min(1080px,92%); margin:0 auto; padding:28px 0 34px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; color:#77899f; font-size:.82rem; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:14px; }
+  .footer-links a { text-decoration:none; }
+  .footer-links a:hover { color:#fff; }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .two-col { grid-template-columns:1fr; }
+    main { padding-top:52px; }
+    .card { padding:22px 18px; }
+  }
+
+</style>

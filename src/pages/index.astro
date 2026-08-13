@@ -1,10 +1,49 @@
 ---
 import cpus from "../data/cpus.json";
 import gpus from "../data/gpus.json";
+import { SITE, absoluteUrl } from "../site-config";
 
-const title = "CPU & GPU Bottleneck Calculator";
+const title = "CPU & GPU Bottleneck Calculator – PC Balance";
 const description =
-  "Estimate whether your CPU and GPU are a balanced match for gaming, streaming, editing, and everyday PC use.";
+  `Free CPU & GPU bottleneck calculator with ${cpus.length} CPUs and ${gpus.length} GPUs. Compare 1080p, 1440p and 4K balance, workload impact, confidence and upgrade paths.`;
+const canonicalUrl = absoluteUrl("/");
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${canonicalUrl}#organization`,
+      name: SITE.name,
+      url: canonicalUrl,
+      description: SITE.description,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${canonicalUrl}#website`,
+      url: canonicalUrl,
+      name: SITE.name,
+      description: SITE.description,
+      inLanguage: SITE.language,
+      publisher: { "@id": `${canonicalUrl}#organization` },
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      isPartOf: { "@id": `${canonicalUrl}#website` },
+      about: [
+        { "@type": "Thing", name: "CPU bottleneck" },
+        { "@type": "Thing", name: "GPU bottleneck" },
+        { "@type": "Thing", name: "PC hardware compatibility" },
+      ],
+      dateModified: SITE.lastReviewed,
+    },
+  ],
+};
 
 const getNumber = (value = "") => {
   const match = value.match(/\d+/);
@@ -101,9 +140,55 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+
+    <meta name="application-name" content={SITE.name} />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <meta name="twitter:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
   </head>
 
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <noscript>
+      <div class="noscript-banner">
+        The calculator requires JavaScript for interactive results. The explanatory content and methodology remain available without it.
+      </div>
+    </noscript>
     <div class="page-shell">
       <header class="site-header">
         <div class="header-inner">
@@ -112,7 +197,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
             <span>PC Balance</span>
           </a>
 
-          <nav class="nav">
+          <nav class="nav" aria-label="Primary navigation">
             <a href="#calculator">Calculator</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#faq">FAQ</a>
@@ -120,7 +205,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
         </div>
       </header>
 
-      <main>
+      <main id="main-content">
         <section class="hero">
           <div class="hero-glow hero-glow-one"></div>
           <div class="hero-glow hero-glow-two"></div>
@@ -1024,11 +1109,10 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               </div>
 
               <p class="method-note">
-                Gaming Engine v2 combines benchmark-calibrated CPU/GPU pairing indices with
-                the selected GPU's native 1080p, 1440p, and 4K raster scaling. A calibrated
-                nonlinear curve improves mild GPU-limited estimates without inflating severe
-                mismatches, while the dead zone filters benchmark noise. The result remains a
-                comparative estimate rather than a universal per-game utilization measurement.
+                Gaming Engine v3.2 combines benchmark-calibrated and confidence-aware CPU/GPU
+                pairing data with resolution behavior, workload context, target FPS, and RAM
+                context where available. Results are comparative estimates rather than universal
+                utilization measurements. <a href="/methodology/">Read the full methodology and source policy.</a>
               </p>
             </section>
 
@@ -1132,47 +1216,126 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
           </div>
         </section>
 
+        <section class="trust-section" id="data-methodology" aria-labelledby="data-methodology-title">
+          <div class="trust-card">
+            <div class="trust-copy">
+              <span class="section-kicker">DATA & METHODOLOGY</span>
+              <h2 id="data-methodology-title">Benchmark-informed, confidence-aware estimates</h2>
+              <p>
+                PC Balance combines normalized CPU and GPU performance profiles with resolution,
+                workload, target-FPS, and memory context. Where direct benchmark coverage is weaker,
+                the calculator lowers its confidence instead of presenting every estimate as equally certain.
+              </p>
+
+              <div class="trust-metrics" aria-label="Calculator coverage">
+                <div><strong>{cpus.length}</strong><span>CPU models</span></div>
+                <div><strong>{gpus.length}</strong><span>GPU models</span></div>
+                <div><strong>3</strong><span>Resolutions</span></div>
+                <div><strong>92k+</strong><span>Matrix checks</span></div>
+              </div>
+
+              <p class="review-line">
+                Methodology last reviewed <strong>{SITE.lastReviewedHuman}</strong>. PC Balance is independent and is not affiliated with AMD, Intel, NVIDIA, Amazon, or Newegg.
+              </p>
+            </div>
+
+            <div class="trust-actions">
+              <a class="trust-primary" href="/methodology/">Read methodology</a>
+              <a href="/about/">About PC Balance</a>
+              <a href="/methodology/#sources">View data sources</a>
+            </div>
+          </div>
+        </section>
+
         <section class="faq-section" id="faq">
           <div class="section-heading">
             <span class="section-kicker">COMMON QUESTIONS</span>
             <h2>Frequently Asked Questions</h2>
+            <p>
+              Bottleneck results are estimates, so the useful question is not whether a PC has a perfectly
+              fixed percentage, but which component is more likely to limit the workload you care about.
+            </p>
           </div>
 
           <div class="faq-list">
             <details>
               <summary>What is a CPU and GPU bottleneck?</summary>
               <p>
-                A bottleneck occurs when one component limits how much
-                performance another component can deliver. In many games, the
-                CPU and GPU can become the limiting component under different
-                conditions.
+                A bottleneck is the part of a workload that limits performance first. In a game, the CPU may
+                limit frame preparation or simulation work while the GPU may limit rendering. The limiting
+                component can change with the game, resolution, graphics settings, and target frame rate.
               </p>
             </details>
 
             <details>
-              <summary>Is a small bottleneck bad?</summary>
+              <summary>Are bottleneck percentages exact measurements?</summary>
               <p>
-                Not necessarily. Every computer has a limiting component at some
-                point. Small differences between CPU and GPU performance are
-                normal.
+                No. A bottleneck percentage is a comparative model estimate, not a universal hardware sensor
+                reading. PC Balance therefore shows an estimate confidence and expected range rather than
+                treating every result as equally certain.
               </p>
             </details>
 
             <details>
-              <summary>Does resolution affect bottlenecks?</summary>
+              <summary>Why can another bottleneck calculator show a different number?</summary>
               <p>
-                Yes. Lower resolutions can place more emphasis on CPU
-                performance, while higher resolutions usually increase the
-                workload placed on the graphics card.
+                Different tools use different benchmark suites, normalization methods, assumptions, and
+                thresholds. Two calculators can disagree on the percentage while still identifying the same
+                likely limiting component. PC Balance focuses on direction, magnitude, context, and confidence.
               </p>
             </details>
 
             <details>
-              <summary>Are bottleneck percentages exact?</summary>
+              <summary>Does resolution affect CPU and GPU bottlenecks?</summary>
               <p>
-                No. They are estimates. Actual performance can change between
-                games, applications, settings, drivers, cooling, and other
-                hardware.
+                Yes. Lower resolutions and very high frame-rate targets can expose CPU limits more often,
+                while higher resolutions generally increase GPU rendering pressure. The exact change still
+                depends on the game or application.
+              </p>
+            </details>
+
+            <details>
+              <summary>Does target FPS matter?</summary>
+              <p>
+                Yes. A 60 FPS target and a 240 FPS target can place very different demands on the processor.
+                If high-refresh gaming matters to you, selecting a target FPS gives the calculator more useful
+                context.
+              </p>
+            </details>
+
+            <details>
+              <summary>Does RAM affect the result?</summary>
+              <p>
+                RAM capacity can affect multitasking, content-creation workloads, and some games, but it does
+                not replace CPU or GPU performance. PC Balance uses RAM as supporting context rather than
+                pretending memory capacity alone determines a CPU–GPU bottleneck.
+              </p>
+            </details>
+
+            <details>
+              <summary>Is a GPU bottleneck always bad?</summary>
+              <p>
+                No. In many gaming workloads it is normal for the GPU to be the limiting component because the
+                graphics card is doing most of the rendering work. What matters is whether performance meets
+                your target and whether the mismatch is large enough to justify an upgrade.
+              </p>
+            </details>
+
+            <details>
+              <summary>How should I use the upgrade recommendations?</summary>
+              <p>
+                Treat them as a shortlist, not a purchase guarantee. Before buying, confirm motherboard socket
+                support, BIOS compatibility, power-supply capacity, physical dimensions, cooling, and local
+                pricing. Retailer buttons are search links rather than live-price or stock guarantees.
+              </p>
+            </details>
+
+            <details>
+              <summary>Why do some older parts have lower estimate confidence?</summary>
+              <p>
+                Older hardware is not always present in the same modern benchmark suites as current parts.
+                When data has to be bridged or calibrated from older references, PC Balance lowers the estimate
+                confidence to reflect that additional uncertainty.
               </p>
             </details>
           </div>
@@ -1223,9 +1386,9 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
 
             <div class="footer-column">
               <h4>PC Balance</h4>
-              <a href="#how-it-works">How It Works</a>
+              <a href="/about/">About PC Balance</a>
+              <a href="/methodology/">Methodology & Sources</a>
               <a href="#faq">Frequently Asked Questions</a>
-              <a href="#methodCard">Calculation Method</a>
               <a href="#shop">Buy or Compare Parts</a>
 
               <div class="footer-coming-soon">
@@ -1241,7 +1404,9 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 does not display live prices or claim retailer availability.
               </p>
               <a href="#shop">Search Parts</a>
-              <a href="#faq">Calculator Disclaimer</a>
+              <a href="/methodology/#shopping-disclosure">Shopping Disclosure</a>
+              <a href="/privacy/">Privacy Policy</a>
+              <a href="/terms/">Terms & Disclaimer</a>
 
               <div class="footer-disclosure">
                 <span>Affiliate-ready</span>
@@ -1263,6 +1428,13 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               Estimates are comparative and can vary by game, application,
               settings, drivers, cooling, memory configuration, and hardware.
             </p>
+
+            <div class="footer-legal-links" aria-label="Legal links">
+              <a href="/about/">About</a>
+              <a href="/methodology/">Methodology</a>
+              <a href="/privacy/">Privacy</a>
+              <a href="/terms/">Terms</a>
+            </div>
 
             <span class="copyright">
               © {new Date().getFullYear()} PC Balance
@@ -1306,6 +1478,39 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
 
   :global(a) {
     color: inherit;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9999;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #07101f;
+    font-weight: 800;
+    text-decoration: none;
+    transform: translateY(-160%);
+    transition: transform 0.18s ease;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
+  .noscript-banner {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(120, 170, 255, 0.32);
+    background: #0d1b31;
+    color: #dce8fb;
+    text-align: center;
+    font-size: 0.92rem;
+  }
+
+  :global(:focus-visible) {
+    outline: 3px solid #78aaff;
+    outline-offset: 3px;
   }
 
   .page-shell {
@@ -1683,6 +1888,127 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
   .calculator-section,
   .info-section,
   .how-section,
+  .trust-section {
+    width: min(1180px, 92%);
+    margin: 0 auto;
+    padding: 24px 0 86px;
+  }
+
+  .trust-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 44px;
+    padding: 34px;
+    border: 1px solid rgba(120, 170, 255, 0.2);
+    border-radius: 24px;
+    background:
+      linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(10, 23, 42, 0.88) 42%),
+      #0a172a;
+  }
+
+  .trust-copy h2 {
+    margin-top: 10px;
+    font-size: clamp(1.7rem, 3vw, 2.35rem);
+    letter-spacing: -0.035em;
+  }
+
+  .trust-copy > p {
+    max-width: 760px;
+    margin-top: 14px;
+    color: #9eadc2;
+    line-height: 1.75;
+  }
+
+  .trust-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .trust-metrics div {
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(6, 18, 35, 0.62);
+  }
+
+  .trust-metrics strong,
+  .trust-metrics span {
+    display: block;
+  }
+
+  .trust-metrics strong {
+    color: #78aaff;
+    font-size: 1.15rem;
+  }
+
+  .trust-metrics span {
+    margin-top: 3px;
+    color: #7f90a7;
+    font-size: 0.76rem;
+  }
+
+  .review-line {
+    font-size: 0.82rem;
+  }
+
+  .trust-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .trust-actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 10px 16px;
+    border: 1px solid rgba(120, 170, 255, 0.22);
+    border-radius: 12px;
+    color: #b8c7da;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 750;
+    transition: 0.2s ease;
+  }
+
+  .trust-actions a:hover {
+    border-color: rgba(120, 170, 255, 0.52);
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .trust-actions .trust-primary {
+    border-color: rgba(120, 170, 255, 0.48);
+    background: rgba(37, 99, 235, 0.18);
+    color: #ffffff;
+  }
+
+  .method-note a {
+    color: #78aaff;
+    font-weight: 700;
+  }
+
+  .footer-legal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .footer-legal-links a {
+    color: #8394aa;
+    font-size: 0.76rem;
+    text-decoration: none;
+  }
+
+  .footer-legal-links a:hover {
+    color: #ffffff;
+  }
+
   .faq-section {
     width: min(1180px, 92%);
     margin: 0 auto;
@@ -3743,6 +4069,28 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
       border-radius: 20px;
     }
   }
+
+  @media (max-width: 820px) {
+    .trust-card {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .trust-metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .trust-card {
+      padding: 24px 18px;
+    }
+
+    .trust-metrics {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
 </style>
 
 <script>

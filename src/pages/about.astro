@@ -1,0 +1,245 @@
+---
+import cpus from "../data/cpus.json";
+import gpus from "../data/gpus.json";
+import { SITE, absoluteUrl } from "../site-config";
+
+const title = "About PC Balance";
+const description = "Learn what PC Balance is, what the bottleneck calculator does, how the project approaches uncertainty, and how its hardware coverage is maintained.";
+const canonicalUrl = absoluteUrl("/about/");
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": `${canonicalUrl}#about`,
+      url: canonicalUrl,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": `${absoluteUrl("/")}#website`,
+        name: SITE.name,
+        url: absoluteUrl("/"),
+      },
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+      dateModified: SITE.lastReviewed,
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "PC Balance",
+          item: absoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "About PC Balance",
+          item: canonicalUrl,
+        },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <meta name="twitter:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>PC Balance</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">PC Balance</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">About</span>
+        </nav>
+        <span class="eyebrow">ABOUT THE PROJECT</span>
+        <h1>About PC Balance</h1>
+        <p class="lede">
+          PC Balance is an independent PC hardware decision-support project built to make CPU and GPU pairing easier to understand without pretending that one percentage can describe every game or application.
+        </p>
+        <div class="meta-row">
+          <span class="meta-chip">{cpus.length} CPU models</span>
+          <span class="meta-chip">{gpus.length} GPU models</span>
+          <span class="meta-chip">Free to use</span>
+          <span class="meta-chip">Independent project</span>
+        </div>
+
+        <div class="content-grid">
+          <section class="card callout">
+            <h2>What PC Balance is trying to solve</h2>
+            <p>
+              PC hardware comparisons often reduce a complicated workload to a single score. PC Balance instead combines component strength with resolution, workload, target FPS, RAM context, and data confidence so users can see both the likely limiting component and how certain the estimate is.
+            </p>
+          </section>
+
+          <div class="two-col">
+            <section class="card">
+              <h2>What the calculator does</h2>
+              <ul>
+                <li>Compares CPU and GPU pairing for gaming and common PC workloads.</li>
+                <li>Models 1080p, 1440p, and 4K behavior separately.</li>
+                <li>Uses target FPS and RAM as optional context.</li>
+                <li>Shows an estimate confidence and expected range.</li>
+                <li>Suggests upgrade directions and nearby hardware options.</li>
+              </ul>
+            </section>
+
+            <section class="card">
+              <h2>What it does not claim</h2>
+              <ul>
+                <li>It is not a direct benchmark of your individual computer.</li>
+                <li>It does not guarantee a fixed bottleneck percentage in every game.</li>
+                <li>It does not display live retailer prices or stock.</li>
+                <li>It does not replace motherboard, PSU, cooling, or case compatibility checks.</li>
+              </ul>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2>Independence and transparency</h2>
+            <p>
+              PC Balance is not affiliated with or endorsed by AMD, Intel, NVIDIA, Amazon, or Newegg. Product names and trademarks belong to their respective owners. Hardware data is organized for comparison and the methodology page explains how direct, derived, legacy, and provisional data are handled.
+            </p>
+            <p><a href="/methodology/">Read the methodology and source policy →</a></p>
+          </section>
+
+          <section class="card">
+            <h2>Project status</h2>
+            <p>
+              The bottleneck calculator is the first stable PC Balance tool. Future tools may include CPU comparison, GPU comparison, FPS estimation, and PSU guidance, but they will be added only when they can provide useful information rather than simply create more pages.
+            </p>
+            <p class="notice">Methodology and data policy last reviewed {SITE.lastReviewedHuman}.</p>
+          </section>
+        </div>
+
+        <a class="back" href="/">← Back to the bottleneck calculator</a>
+      </main>
+      <footer>
+        <div class="footer-inner">
+          <span>© {new Date().getFullYear()} PC Balance</span>
+          <div class="footer-links">
+            <a href="/">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/terms/">Terms</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link {
+    position: fixed; top: 12px; left: 12px; z-index: 9999; padding: 10px 14px;
+    border-radius: 10px; background: #fff; color: #07101f; font-weight: 800;
+    transform: translateY(-160%); transition: transform .18s ease;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  .shell { min-height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(37,99,235,.12), transparent 34%), linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(7,16,31,.9); }
+  .header-inner { width: min(1080px,92%); min-height: 72px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover { color:#fff; }
+  main { width:min(960px,92%); margin:0 auto; padding:72px 0 90px; }
+  .eyebrow { color:#78aaff; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.3rem,6vw,4rem); line-height:1.05; letter-spacing:-.045em; }
+  .lede { max-width:780px; margin:0; color:#a8b7cb; font-size:1.05rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .content-grid { display:grid; gap:18px; margin-top:42px; }
+  .card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .card h2 { margin:0 0 12px; font-size:1.45rem; letter-spacing:-.025em; }
+  .card h3 { margin:22px 0 8px; font-size:1.05rem; }
+  .card p { margin:10px 0 0; color:#9eadc2; }
+  .card ul, .card ol { margin:12px 0 0; padding-left:22px; color:#9eadc2; }
+  .card li + li { margin-top:8px; }
+  .card a { color:#78aaff; font-weight:700; }
+  .two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .source-list { display:grid; gap:12px; margin-top:16px; }
+  .source-item { padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:14px; background:rgba(5,16,31,.55); }
+  .source-item strong { display:block; margin-bottom:5px; }
+  .source-item span { color:#8193aa; font-size:.86rem; }
+  .notice { padding:15px 16px; border-left:3px solid #78aaff; border-radius:0 12px 12px 0; background:rgba(37,99,235,.09); color:#b7c6d8; }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  footer { border-top:1px solid rgba(255,255,255,.07); }
+  .footer-inner { width:min(1080px,92%); margin:0 auto; padding:28px 0 34px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; color:#77899f; font-size:.82rem; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:14px; }
+  .footer-links a { text-decoration:none; }
+  .footer-links a:hover { color:#fff; }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .two-col { grid-template-columns:1fr; }
+    main { padding-top:52px; }
+    .card { padding:22px 18px; }
+  }
+
+</style>
