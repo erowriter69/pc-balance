@@ -742,6 +742,11 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 Results are estimates and may vary by game, software, settings,
                 cooling, and system configuration.
               </p>
+
+              <p class="result-link-notice" id="resultLinkNotice" role="status" aria-live="polite" hidden>
+                Run a calculation first to open System at a Glance, resolution analysis,
+                upgrade recommendations, RAM guidance, and parts recommendations.
+              </p>
             </div>
           </div>
 
@@ -1378,10 +1383,13 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
             <div class="footer-column">
               <h4>Calculator</h4>
               <a href="#calculator">Bottleneck Calculator</a>
-              <a href="#buildReport">System at a Glance</a>
-              <a href="#resolution-summary">Resolution Analysis</a>
-              <a href="#upgrade-options">Upgrade Recommendations</a>
-              <a href="#memory-guidance">RAM Guidance</a>
+              <a href="#buildReport" data-result-target="buildReport">System at a Glance</a>
+              <a href="#resolution-summary" data-result-target="resolution-summary">Resolution Analysis</a>
+              <a href="#upgrade-options" data-result-target="upgrade-options">Upgrade Recommendations</a>
+              <a href="#memory-guidance" data-result-target="memory-guidance">RAM Guidance</a>
+              <p class="footer-result-note">
+                Result sections become available after you run a calculation.
+              </p>
             </div>
 
             <div class="footer-column">
@@ -1389,7 +1397,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <a href="/about/">About PC Balance</a>
               <a href="/methodology/">Methodology & Sources</a>
               <a href="#faq">Frequently Asked Questions</a>
-              <a href="#shop">Buy or Compare Parts</a>
+              <a href="#shop" data-result-target="shop">Buy or Compare Parts</a>
 
               <div class="footer-coming-soon">
                 <span>More tools</span>
@@ -1403,7 +1411,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 Retailer buttons currently open normal product searches. PC Balance
                 does not display live prices or claim retailer availability.
               </p>
-              <a href="#shop">Search Parts</a>
+              <a href="#shop" data-result-target="shop">Search Parts</a>
               <a href="/methodology/#shopping-disclosure">Shopping Disclosure</a>
               <a href="/privacy/">Privacy Policy</a>
               <a href="/terms/">Terms & Disclaimer</a>
@@ -3727,6 +3735,32 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
     line-height: 1.6;
   }
 
+  .footer-result-note {
+    margin: 4px 0 0;
+    color: #60748d;
+    font-size: 0.66rem;
+    line-height: 1.5;
+  }
+
+  .result-link-notice {
+    margin-top: 10px !important;
+    padding: 10px 12px;
+    border: 1px solid rgba(111, 166, 255, 0.22);
+    border-radius: 10px;
+    background: rgba(39, 91, 172, 0.12);
+    color: #9dbbe7 !important;
+    font-size: 0.76rem !important;
+    line-height: 1.55 !important;
+  }
+
+  #buildReport,
+  #resolution-summary,
+  #upgrade-options,
+  #memory-guidance,
+  #shop {
+    scroll-margin-top: 24px;
+  }
+
   .footer-coming-soon,
   .footer-disclosure {
     margin-top: 8px;
@@ -4131,6 +4165,65 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
   const confidenceSummary = document.getElementById("confidenceSummary");
   const confidencePoints = document.getElementById("confidencePoints");
   const newCalculationButton = document.getElementById("newCalculationButton");
+  const resultLinkNotice = document.getElementById("resultLinkNotice");
+  const resultDependentLinks = document.querySelectorAll<HTMLAnchorElement>("[data-result-target]");
+  const calculatorSection = document.getElementById("calculator");
+
+  const hiddenResultTargets = new Set([
+    "buildReport",
+    "resolution-summary",
+    "upgrade-options",
+    "memory-guidance",
+    "shop"
+  ]);
+
+  let resultLinkNoticeTimer: number | undefined;
+
+  const showResultLinkNotice = () => {
+    if (!resultLinkNotice) return;
+
+    resultLinkNotice.hidden = false;
+
+    if (resultLinkNoticeTimer !== undefined) {
+      window.clearTimeout(resultLinkNoticeTimer);
+    }
+
+    resultLinkNoticeTimer = window.setTimeout(() => {
+      resultLinkNotice.hidden = true;
+    }, 6500);
+  };
+
+  const sendResultLinkToCalculator = () => {
+    if (history.replaceState) {
+      history.replaceState(null, "", "#calculator");
+    }
+
+    calculatorSection?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    showResultLinkNotice();
+  };
+
+  resultDependentLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const targetId = link.dataset.resultTarget;
+      const resultsAreVisible = resultCard?.classList.contains("show") ?? false;
+
+      if (!targetId || resultsAreVisible) return;
+
+      event.preventDefault();
+      sendResultLinkToCalculator();
+    });
+  });
+
+  const initialHash = window.location.hash.slice(1);
+  if (hiddenResultTargets.has(initialHash) && !(resultCard?.classList.contains("show") ?? false)) {
+    requestAnimationFrame(() => {
+      sendResultLinkToCalculator();
+    });
+  }
 
   const resolution1080Card = document.getElementById("resolution1080Card");
   const resolution1440Card = document.getElementById("resolution1440Card");
