@@ -3,10 +3,68 @@ import cpus from "../data/cpus.json";
 import gpus from "../data/gpus.json";
 import { SITE, absoluteUrl } from "../site-config";
 
-const title = "CPU & GPU Bottleneck Calculator – CalcBottleneck";
+const title = "CPU & GPU Bottleneck Calculator for PC Builds | CalcBottleneck";
 const description =
-  `Free CPU & GPU bottleneck calculator with ${cpus.length} CPUs and ${gpus.length} GPUs. Compare 1080p, 1440p and 4K balance, workload impact, confidence and upgrade paths.`;
+  `Free PC bottleneck calculator with ${cpus.length} CPUs and ${gpus.length} GPUs. Check CPU and GPU balance at 1080p, 1440p and 4K, estimate likely limits, and review upgrade guidance.`;
 const canonicalUrl = absoluteUrl("/");
+
+const faqItems = [
+  {
+    question: "What is a CPU and GPU bottleneck?",
+    answer:
+      "A bottleneck is the part of a workload that limits performance first. In a game, the CPU may limit frame preparation or simulation work while the GPU may limit rendering. The limiting component can change with the game, resolution, graphics settings, and target frame rate.",
+  },
+  {
+    question: "Are bottleneck percentages exact measurements?",
+    answer:
+      "No. A bottleneck percentage is a comparative model estimate, not a universal hardware sensor reading. CalcBottleneck shows estimate confidence and an expected range rather than treating every result as equally certain.",
+  },
+  {
+    question: "Why can another bottleneck calculator show a different number?",
+    answer:
+      "Different tools use different benchmark suites, normalization methods, assumptions, and thresholds. Two calculators can disagree on the percentage while still identifying the same likely limiting component.",
+  },
+  {
+    question: "Does resolution affect CPU and GPU bottlenecks?",
+    answer:
+      "Yes. Lower resolutions and very high frame-rate targets can expose CPU limits more often, while higher resolutions generally increase GPU rendering pressure. The exact change still depends on the game or application.",
+  },
+  {
+    question: "Is a 10% bottleneck bad?",
+    answer:
+      "Not necessarily. There is no universal percentage that makes a PC good or bad. A modest estimate can fall within normal workload and benchmark variation, so the more useful questions are whether the system meets your performance target and how confident the estimate is.",
+  },
+  {
+    question: "How do I reduce a CPU or GPU bottleneck?",
+    answer:
+      "Start by confirming the limiting component for the resolution, settings, and frame-rate target you actually use. A CPU-limited system may benefit from a faster processor or a lower frame-rate target, while a GPU-limited system may benefit from lower graphics settings, upscaling, or a faster graphics card.",
+  },
+  {
+    question: "Does target FPS matter?",
+    answer:
+      "Yes. A 60 FPS target and a 240 FPS target can place very different demands on the processor. Selecting a target FPS gives the calculator more useful context for high-refresh gaming.",
+  },
+  {
+    question: "Does RAM affect the result?",
+    answer:
+      "RAM capacity can affect multitasking, content-creation workloads, and some games, but it does not replace CPU or GPU performance. CalcBottleneck uses RAM as supporting context rather than treating memory capacity alone as the bottleneck.",
+  },
+  {
+    question: "Is a GPU bottleneck always bad?",
+    answer:
+      "No. In many gaming workloads it is normal for the GPU to be the limiting component because the graphics card is doing most of the rendering work. What matters is whether performance meets your target and whether the mismatch is large enough to justify an upgrade.",
+  },
+  {
+    question: "How should I use the upgrade recommendations?",
+    answer:
+      "Treat them as a shortlist, not a purchase guarantee. Before buying, confirm motherboard socket support, BIOS compatibility, power-supply capacity, physical dimensions, cooling, and local pricing.",
+  },
+  {
+    question: "Why do some older parts have lower estimate confidence?",
+    answer:
+      "Older hardware is not always present in the same modern benchmark suites as current parts. When data has to be bridged or calibrated from older references, CalcBottleneck lowers the estimate confidence to reflect that additional uncertainty.",
+  },
+] as const;
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -41,6 +99,41 @@ const structuredData = {
         { "@type": "Thing", name: "PC hardware compatibility" },
       ],
       dateModified: SITE.lastReviewed,
+      mainEntity: { "@id": `${canonicalUrl}#calculator` },
+    },
+    {
+      "@type": "WebApplication",
+      "@id": `${canonicalUrl}#calculator`,
+      name: "CalcBottleneck CPU & GPU Bottleneck Calculator",
+      url: canonicalUrl,
+      description,
+      applicationCategory: "UtilitiesApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript",
+      isAccessibleForFree: true,
+      featureList: [
+        "CPU and GPU bottleneck comparison",
+        "1080p, 1440p and 4K resolution analysis",
+        "Workload and target-FPS context",
+        "Confidence-aware estimates",
+        "Upgrade guidance",
+      ],
+      isPartOf: { "@id": `${canonicalUrl}#website` },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${canonicalUrl}#faq-page`,
+      url: `${canonicalUrl}#faq`,
+      inLanguage: SITE.language,
+      isPartOf: { "@id": `${canonicalUrl}#webpage` },
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
     },
   ],
 };
@@ -1129,10 +1222,11 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
         <section class="info-section">
           <div class="section-heading">
             <span class="section-kicker">WHY IT MATTERS</span>
-            <h2>A Balanced PC Gives You More From Your Hardware</h2>
+            <h2>What CPU and GPU Bottlenecks Mean for PC Performance</h2>
             <p>
-              A bottleneck happens when one component cannot keep up with
-              another, limiting the performance your system can deliver.
+              A PC bottleneck happens when one component becomes the main performance limit.
+              Whether that is the CPU or GPU can change with the game, application, resolution,
+              graphics settings, and frame-rate target.
             </p>
           </div>
 
@@ -1176,12 +1270,12 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
           <div class="how-card">
             <div class="how-copy">
               <span class="section-kicker">HOW IT WORKS</span>
-              <h2>Simple Inputs. Clear Results.</h2>
+              <h2>How the Bottleneck Calculator Works</h2>
 
               <p>
-                Our calculator will compare the relative performance of your CPU
-                and GPU while considering resolution and the type of work you
-                want your PC to perform.
+                CalcBottleneck compares the relative performance of your CPU and GPU, then adds
+                resolution, workload, target-FPS, and memory context to estimate which component
+                is more likely to limit the PC you are building or upgrading.
               </p>
             </div>
 
@@ -1252,7 +1346,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
         <section class="faq-section" id="faq">
           <div class="section-heading">
             <span class="section-kicker">COMMON QUESTIONS</span>
-            <h2>Frequently Asked Questions</h2>
+            <h2>CPU & GPU Bottleneck Calculator FAQ</h2>
             <p>
               Bottleneck results are estimates, so the useful question is not whether a PC has a perfectly
               fixed percentage, but which component is more likely to limit the workload you care about.
@@ -1293,6 +1387,26 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 Yes. Lower resolutions and very high frame-rate targets can expose CPU limits more often,
                 while higher resolutions generally increase GPU rendering pressure. The exact change still
                 depends on the game or application.
+              </p>
+            </details>
+
+            <details>
+              <summary>Is a 10% bottleneck bad?</summary>
+              <p>
+                Not necessarily. There is no universal percentage that makes a PC good or bad.
+                A modest estimate can fall within normal workload and benchmark variation, so focus
+                on whether the system meets your performance target and how confident the estimate is.
+              </p>
+            </details>
+
+            <details>
+              <summary>How do I reduce a CPU or GPU bottleneck?</summary>
+              <p>
+                Start by confirming the likely limiting component for the resolution, settings, and
+                frame-rate target you actually use. A CPU-limited system may benefit from a faster
+                processor or a lower FPS target. A GPU-limited system may benefit from lower graphics
+                settings, upscaling, or a faster graphics card. Review the
+                <a href="/methodology/">methodology</a> before treating any percentage as an exact measurement.
               </p>
             </details>
 

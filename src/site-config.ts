@@ -5,10 +5,10 @@ export const SITE = {
   locale: "en_US",
   themeColor: "#07101f",
   version: "1.0",
-  lastReviewed: "2026-08-13",
-  lastReviewedHuman: "August 13, 2026",
+  lastReviewed: "2026-08-15",
+  lastReviewedHuman: "August 15, 2026",
   description:
-    "CalcBottleneck provides benchmark-informed PC hardware decision-support tools for comparing CPU and GPU balance, resolution behavior, and upgrade paths.",
+    "CalcBottleneck is a free, benchmark-informed CPU & GPU bottleneck calculator for comparing PC balance at 1080p, 1440p and 4K with confidence-aware estimates and upgrade guidance.",
 } as const;
 
 export const SITE_PAGES = [
