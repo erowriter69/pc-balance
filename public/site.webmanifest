@@ -1,6 +1,6 @@
 {
-  "name": "PC Balance \u2013 CPU & GPU Bottleneck Calculator",
-  "short_name": "PC Balance",
+  "name": "CalcBottleneck \u2013 CPU & GPU Bottleneck Calculator",
+  "short_name": "CalcBottleneck",
   "description": "Benchmark-informed CPU and GPU bottleneck estimates with resolution, workload, confidence, and upgrade guidance.",
   "start_url": "/",
   "scope": "/",

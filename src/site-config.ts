@@ -1,5 +1,5 @@
 export const SITE = {
-  name: "PC Balance",
+  name: "CalcBottleneck",
   origin: "https://www.calcbottleneck.com",
   language: "en",
   locale: "en_US",
@@ -8,7 +8,7 @@ export const SITE = {
   lastReviewed: "2026-08-13",
   lastReviewedHuman: "August 13, 2026",
   description:
-    "Independent, benchmark-informed PC hardware decision-support tools for comparing CPU and GPU balance, resolution behavior, and upgrade paths.",
+    "CalcBottleneck provides benchmark-informed PC hardware decision-support tools for comparing CPU and GPU balance, resolution behavior, and upgrade paths.",
 } as const;
 
 export const SITE_PAGES = [

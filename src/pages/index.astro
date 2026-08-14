@@ -3,7 +3,7 @@ import cpus from "../data/cpus.json";
 import gpus from "../data/gpus.json";
 import { SITE, absoluteUrl } from "../site-config";
 
-const title = "CPU & GPU Bottleneck Calculator – PC Balance";
+const title = "CPU & GPU Bottleneck Calculator – CalcBottleneck";
 const description =
   `Free CPU & GPU bottleneck calculator with ${cpus.length} CPUs and ${gpus.length} GPUs. Compare 1080p, 1440p and 4K balance, workload impact, confidence and upgrade paths.`;
 const canonicalUrl = absoluteUrl("/");
@@ -166,13 +166,13 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+    <meta property="og:image:alt" content="CalcBottleneck CPU & GPU Bottleneck Calculator" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
-    <meta name="twitter:image:alt" content="PC Balance CPU and GPU Bottleneck Calculator" />
+    <meta name="twitter:image:alt" content="CalcBottleneck CPU & GPU Bottleneck Calculator" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -194,7 +194,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
         <div class="header-inner">
           <a class="brand" href="/">
             <span class="brand-icon">⚡</span>
-            <span>PC Balance</span>
+            <span>CalcBottleneck</span>
           </a>
 
           <nav class="nav" aria-label="Primary navigation">
@@ -1224,7 +1224,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <span class="section-kicker">DATA & METHODOLOGY</span>
               <h2 id="data-methodology-title">Benchmark-informed, confidence-aware estimates</h2>
               <p>
-                PC Balance combines normalized CPU and GPU performance profiles with resolution,
+                CalcBottleneck combines normalized CPU and GPU performance profiles with resolution,
                 workload, target-FPS, and memory context. Where direct benchmark coverage is weaker,
                 the calculator lowers its confidence instead of presenting every estimate as equally certain.
               </p>
@@ -1237,13 +1237,13 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               </div>
 
               <p class="review-line">
-                Methodology last reviewed <strong>{SITE.lastReviewedHuman}</strong>. PC Balance is independent and is not affiliated with AMD, Intel, NVIDIA, Amazon, or Newegg.
+                Methodology last reviewed <strong>{SITE.lastReviewedHuman}</strong>. CalcBottleneck is independent and is not affiliated with AMD, Intel, NVIDIA, Amazon, or Newegg.
               </p>
             </div>
 
             <div class="trust-actions">
               <a class="trust-primary" href="/methodology/">Read methodology</a>
-              <a href="/about/">About PC Balance</a>
+              <a href="/about/">About CalcBottleneck</a>
               <a href="/methodology/#sources">View data sources</a>
             </div>
           </div>
@@ -1273,7 +1273,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <summary>Are bottleneck percentages exact measurements?</summary>
               <p>
                 No. A bottleneck percentage is a comparative model estimate, not a universal hardware sensor
-                reading. PC Balance therefore shows an estimate confidence and expected range rather than
+                reading. CalcBottleneck therefore shows an estimate confidence and expected range rather than
                 treating every result as equally certain.
               </p>
             </details>
@@ -1283,7 +1283,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <p>
                 Different tools use different benchmark suites, normalization methods, assumptions, and
                 thresholds. Two calculators can disagree on the percentage while still identifying the same
-                likely limiting component. PC Balance focuses on direction, magnitude, context, and confidence.
+                likely limiting component. CalcBottleneck focuses on direction, magnitude, context, and confidence.
               </p>
             </details>
 
@@ -1309,7 +1309,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <summary>Does RAM affect the result?</summary>
               <p>
                 RAM capacity can affect multitasking, content-creation workloads, and some games, but it does
-                not replace CPU or GPU performance. PC Balance uses RAM as supporting context rather than
+                not replace CPU or GPU performance. CalcBottleneck uses RAM as supporting context rather than
                 pretending memory capacity alone determines a CPU–GPU bottleneck.
               </p>
             </details>
@@ -1336,7 +1336,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <summary>Why do some older parts have lower estimate confidence?</summary>
               <p>
                 Older hardware is not always present in the same modern benchmark suites as current parts.
-                When data has to be bridged or calibrated from older references, PC Balance lowers the estimate
+                When data has to be bridged or calibrated from older references, CalcBottleneck lowers the estimate
                 confidence to reflect that additional uncertainty.
               </p>
             </details>
@@ -1433,7 +1433,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
           </div>
 
           <p class="shop-disclosure-note">
-            Retailer links are standard search links. PC Balance does not display live prices,
+            Retailer links are standard search links. CalcBottleneck does not display live prices,
             guarantee stock or compatibility, or claim retailer availability. Check the
             <a href="/methodology/#shopping-disclosure">shopping disclosure</a> before purchasing.
           </p>
@@ -1446,13 +1446,13 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
             <div class="footer-about">
               <a class="brand footer-brand" href="/">
                 <span class="brand-icon">⚡</span>
-                <span>PC Balance</span>
+                <span>CalcBottleneck</span>
               </a>
 
               <h3>Build a better-balanced PC.</h3>
 
               <p>
-                PC Balance helps you compare processor and graphics-card strength,
+                CalcBottleneck helps you compare processor and graphics-card strength,
                 understand likely bottlenecks, and make more informed upgrade
                 decisions for gaming and everyday workloads.
               </p>
@@ -1482,8 +1482,8 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
             </div>
 
             <div class="footer-column">
-              <h4>PC Balance</h4>
-              <a href="/about/">About PC Balance</a>
+              <h4>CalcBottleneck</h4>
+              <a href="/about/">About CalcBottleneck</a>
               <a href="/methodology/">Methodology & Sources</a>
               <a href="#faq">Frequently Asked Questions</a>
               <a href="#shop">Buy or Compare Parts</a>
@@ -1497,7 +1497,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
             <div class="footer-column">
               <h4>Shopping & Disclosure</h4>
               <p class="footer-column-copy">
-                Retailer buttons currently open normal product searches. PC Balance
+                Retailer buttons currently open normal product searches. CalcBottleneck
                 does not display live prices or claim retailer availability.
               </p>
               <a href="#shop">Search Parts</a>
@@ -1518,7 +1518,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
 
           <div class="footer-secondary">
             <div>
-              <strong>PC Balance</strong>
+              <strong>CalcBottleneck</strong>
               <span>CPU & GPU decision-support tools</span>
             </div>
 
@@ -1535,7 +1535,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
             </div>
 
             <span class="copyright">
-              © {new Date().getFullYear()} PC Balance
+              © {new Date().getFullYear()} CalcBottleneck
             </span>
           </div>
         </div>
