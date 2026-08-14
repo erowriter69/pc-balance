@@ -1,6 +1,6 @@
 export const SITE = {
   name: "PC Balance",
-  origin: "https://pc-balance.pages.dev",
+  origin: "https://www.calcbottleneck.com",
   language: "en",
   locale: "en_US",
   themeColor: "#07101f",
