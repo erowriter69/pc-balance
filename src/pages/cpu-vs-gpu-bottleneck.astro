@@ -1,0 +1,262 @@
+---
+import { SITE, absoluteUrl } from "../site-config";
+
+const title = 'CPU Bottleneck vs GPU Bottleneck: How to Tell the Difference | CalcBottleneck';
+const description = 'Learn the difference between a CPU bottleneck and GPU bottleneck, the symptoms of each, how resolution and target FPS change the limiting component, and what to check before upgrading.';
+const canonicalUrl = absoluteUrl('/cpu-vs-gpu-bottleneck/');
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": `${canonicalUrl}#article`,
+      url: canonicalUrl,
+      headline: title,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      mainEntityOfPage: canonicalUrl,
+      author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      publisher: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      datePublished: "2026-08-15",
+      dateModified: SITE.lastReviewed,
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": `${absoluteUrl("/")}#website`,
+        name: SITE.name,
+        url: absoluteUrl("/"),
+      },
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "CalcBottleneck", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: 'CPU vs GPU Bottleneck', item: canonicalUrl },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="CalcBottleneck CPU & GPU Bottleneck Calculator" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>CalcBottleneck</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">CalcBottleneck</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">CPU vs GPU Bottleneck</span>
+        </nav>
+        <span class="eyebrow">PC BOTTLENECK GUIDE</span>
+        <h1>CPU Bottleneck vs GPU Bottleneck: How to Tell the Difference</h1>
+        <p class="lede">A CPU bottleneck and a GPU bottleneck can produce similar symptoms—lower frame rates, inconsistent performance, or hardware that seems underused—but they happen for different reasons. The key is identifying which component is limiting the workload you actually care about.</p>
+        <div class="meta-row"><span class="meta-chip">CPU limits</span><span class="meta-chip">GPU limits</span><span class="meta-chip">Gaming context</span><span class="meta-chip">Upgrade guidance</span></div>
+
+        <div class="content-grid">
+          <section class="card callout">
+            <h2>The short version</h2>
+            <p>
+              A <strong>CPU bottleneck</strong> happens when the processor cannot prepare work quickly enough for the graphics card or application. A <strong>GPU bottleneck</strong> happens when the graphics card is the slower stage of the workload. Neither condition is automatically bad: every real workload eventually has a limiting component.
+            </p>
+            <p>
+              The practical question is whether the limiting component keeps you below your target frame rate or makes an upgrade poor value. Use the <a href="/#calculator">CalcBottleneck calculator</a> to compare a specific CPU and GPU, then use the checks below to interpret the result.
+            </p>
+          </section>
+
+          <div class="two-col">
+            <section class="card">
+              <h2>Typical CPU-bottleneck signs</h2>
+              <ul>
+                <li>Frame rate changes little when you lower graphics quality or resolution.</li>
+                <li>The GPU is not consistently close to full utilization during the demanding scene you are testing.</li>
+                <li>High-refresh or simulation-heavy games struggle more than visually heavy games.</li>
+                <li>One or more important CPU threads can be saturated even when total CPU utilization looks moderate.</li>
+              </ul>
+            </section>
+            <section class="card">
+              <h2>Typical GPU-bottleneck signs</h2>
+              <ul>
+                <li>The GPU spends much of the demanding workload near full utilization.</li>
+                <li>Lowering resolution, ray tracing, or graphics settings noticeably increases frame rate.</li>
+                <li>Moving from 1080p to 1440p or 4K reduces performance substantially.</li>
+                <li>A faster CPU would not materially change the frame rate at the same visual settings.</li>
+              </ul>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2>Why overall CPU usage can be misleading</h2>
+            <p>
+              A game does not necessarily use every processor core equally. A single busy game thread, simulation thread, or draw-call path can limit frame production while the operating system still reports plenty of unused CPU capacity overall. That is why “my CPU is only at 50%” does not prove that the CPU is not the limiter.
+            </p>
+            <p>
+              Look at per-core behavior, frame-time consistency, GPU utilization, and what happens when you change settings. A repeatable change is more useful than one utilization number captured at a random moment.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Resolution changes the balance</h2>
+            <p>
+              Lower resolutions usually make it easier for the GPU to render each frame, which can expose the CPU sooner—especially when chasing 120, 144, 240 FPS or more. Higher resolutions generally increase the amount of work the GPU performs per frame, so the balance can shift toward a GPU limit.
+            </p>
+            <p>
+              This is not a fixed rule for every game. Engine behavior, ray tracing, upscaling, frame generation, graphics presets, and the target FPS all matter. Read the dedicated guide to <a href="/bottleneck-and-resolution/">1080p, 1440p and 4K bottlenecks</a> for a more detailed explanation.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>A simple test before you upgrade</h2>
+            <ol>
+              <li>Choose a repeatable scene, benchmark, or workload that represents how you actually use the PC.</li>
+              <li>Record frame rate or task time, GPU utilization, and frame-time behavior.</li>
+              <li>Reduce resolution or GPU-heavy settings without changing the scene.</li>
+              <li>If performance rises strongly, the GPU was probably an important limit. If performance barely changes while the GPU has headroom, investigate the CPU or another system limit.</li>
+              <li>Repeat more than once. Background tasks and temperature can distort a single run.</li>
+            </ol>
+            <p class="notice">
+              Utilization is evidence, not a diagnosis by itself. Memory limits, thermal throttling, power limits, drivers, game caps, storage stalls, and background software can imitate a CPU/GPU bottleneck.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Which bottleneck is better for gaming?</h2>
+            <p>
+              There is no universally “best” bottleneck. In a visually demanding game, being GPU-limited is normal because you are using the graphics card you paid for. In a competitive title, a CPU limit may matter more because players often lower visual settings to chase very high frame rates. What matters is whether the system meets your target smoothly and whether spending money on a different component would produce a meaningful improvement.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Related bottleneck guides</h2>
+            <ul>
+              <li><a href="/bottleneck-and-resolution/">How 1080p, 1440p and 4K affect bottlenecks</a></li>
+              <li><a href="/is-10-percent-bottleneck-bad/">Is a 10% bottleneck bad?</a></li>
+              <li><a href="/how-to-fix-pc-bottleneck/">How to reduce a CPU or GPU bottleneck</a></li>
+              <li><a href="/methodology/">How CalcBottleneck estimates PC balance</a></li>
+            </ul>
+          </section>
+        </div>
+
+        <a class="back" href="/#calculator">← Back to the bottleneck calculator</a>
+      </main>
+      <footer>
+        <div class="footer-inner">
+          <span>© {new Date().getFullYear()} CalcBottleneck</span>
+          <div class="footer-links">
+            <a href="/">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/terms/">Terms</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link {
+    position: fixed; top: 12px; left: 12px; z-index: 9999; padding: 10px 14px;
+    border-radius: 10px; background: #fff; color: #07101f; font-weight: 800;
+    transform: translateY(-160%); transition: transform .18s ease;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  .shell { min-height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(37,99,235,.12), transparent 34%), linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(7,16,31,.9); }
+  .header-inner { width: min(1080px,92%); min-height: 72px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover { color:#fff; }
+  main { width:min(960px,92%); margin:0 auto; padding:72px 0 90px; }
+  .eyebrow { color:#78aaff; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.3rem,6vw,4rem); line-height:1.05; letter-spacing:-.045em; }
+  .lede { max-width:800px; margin:0; color:#a8b7cb; font-size:1.05rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .content-grid { display:grid; gap:18px; margin-top:42px; }
+  .card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .card h2 { margin:0 0 12px; font-size:1.45rem; letter-spacing:-.025em; }
+  .card h3 { margin:22px 0 8px; font-size:1.05rem; }
+  .card p { margin:10px 0 0; color:#9eadc2; }
+  .card ul, .card ol { margin:12px 0 0; padding-left:22px; color:#9eadc2; }
+  .card li + li { margin-top:8px; }
+  .card a { color:#78aaff; font-weight:700; }
+  .two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .notice { padding:15px 16px; border-left:3px solid #78aaff; border-radius:0 12px 12px 0; background:rgba(37,99,235,.09); color:#b7c6d8; }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  footer { border-top:1px solid rgba(255,255,255,.07); }
+  .footer-inner { width:min(1080px,92%); margin:0 auto; padding:28px 0 34px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; color:#77899f; font-size:.82rem; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:14px; }
+  .footer-links a { text-decoration:none; }
+  .footer-links a:hover { color:#fff; }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .two-col { grid-template-columns:1fr; }
+    main { padding-top:52px; }
+    .card { padding:22px 18px; }
+  }
+</style>

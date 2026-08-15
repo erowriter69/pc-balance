@@ -1360,6 +1360,8 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 A bottleneck is the part of a workload that limits performance first. In a game, the CPU may
                 limit frame preparation or simulation work while the GPU may limit rendering. The limiting
                 component can change with the game, resolution, graphics settings, and target frame rate.
+                See the <a href="/cpu-vs-gpu-bottleneck/">CPU bottleneck vs GPU bottleneck guide</a>
+                for the practical signs of each.
               </p>
             </details>
 
@@ -1386,7 +1388,8 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <p>
                 Yes. Lower resolutions and very high frame-rate targets can expose CPU limits more often,
                 while higher resolutions generally increase GPU rendering pressure. The exact change still
-                depends on the game or application.
+                depends on the game or application. Read how <a href="/bottleneck-and-resolution/">1080p,
+                1440p and 4K can change the limiting component</a>.
               </p>
             </details>
 
@@ -1396,6 +1399,8 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 Not necessarily. There is no universal percentage that makes a PC good or bad.
                 A modest estimate can fall within normal workload and benchmark variation, so focus
                 on whether the system meets your performance target and how confident the estimate is.
+                The <a href="/is-10-percent-bottleneck-bad/">10% bottleneck guide</a> explains when a
+                percentage is worth investigating.
               </p>
             </details>
 
@@ -1405,7 +1410,8 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
                 Start by confirming the likely limiting component for the resolution, settings, and
                 frame-rate target you actually use. A CPU-limited system may benefit from a faster
                 processor or a lower FPS target. A GPU-limited system may benefit from lower graphics
-                settings, upscaling, or a faster graphics card. Review the
+                settings, upscaling, or a faster graphics card. See the step-by-step
+                <a href="/how-to-fix-pc-bottleneck/">guide to reducing a CPU or GPU bottleneck</a>, and review the
                 <a href="/methodology/">methodology</a> before treating any percentage as an exact measurement.
               </p>
             </details>

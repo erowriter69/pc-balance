@@ -13,6 +13,10 @@ export const SITE = {
 
 export const SITE_PAGES = [
   "/",
+  "/cpu-vs-gpu-bottleneck/",
+  "/bottleneck-and-resolution/",
+  "/is-10-percent-bottleneck-bad/",
+  "/how-to-fix-pc-bottleneck/",
   "/about/",
   "/methodology/",
   "/privacy/",
