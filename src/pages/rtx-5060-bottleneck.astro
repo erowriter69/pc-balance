@@ -1,0 +1,330 @@
+---
+import { SITE, absoluteUrl } from "../site-config";
+
+const title = 'RTX 5060 Bottleneck Calculator & CPU Guide | CalcBottleneck';
+const description = 'Check CPU and RTX 5060 balance at 1080p, 1440p and 4K. Learn how target FPS and 8 GB VRAM affect the result, then test your exact pairing.';
+const canonicalUrl = absoluteUrl('/rtx-5060-bottleneck/');
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": `${canonicalUrl}#article`,
+      url: canonicalUrl,
+      headline: title,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      mainEntityOfPage: canonicalUrl,
+      author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      publisher: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      datePublished: "2026-08-15",
+      dateModified: SITE.lastReviewed,
+      about: [
+        { "@type": "Thing", name: "RTX 5060" },
+        { "@type": "Thing", name: "CPU bottleneck" },
+        { "@type": "Thing", name: "GPU bottleneck" }
+      ],
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": `${absoluteUrl("/")}#website`,
+        name: SITE.name,
+        url: absoluteUrl("/"),
+      },
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "CalcBottleneck", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "RTX 5060 Bottleneck Guide", item: canonicalUrl },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="CalcBottleneck CPU & GPU Bottleneck Calculator" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>CalcBottleneck</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">CalcBottleneck</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">RTX 5060 Bottleneck Guide</span>
+        </nav>
+        <span class="eyebrow">RTX 5060 CPU PAIRING GUIDE</span>
+        <h1>RTX 5060 Bottleneck Calculator & CPU Pairing Guide</h1>
+        <p class="lede">The GeForce RTX 5060 is an 8 GB GDDR7 Blackwell graphics card. It is a natural match for 1080p-focused systems, but CPU limits can become more visible when settings are lowered to chase high frame rates. Use this guide to separate CPU balance from GPU or VRAM limits and test your exact CPU.</p>
+        <div class="meta-row"><span class="meta-chip">RTX 5060</span><span class="meta-chip">CPU pairing</span><span class="meta-chip">1080p / 1440p / 4K</span><span class="meta-chip">Upgrade guidance</span></div>
+
+        <div class="content-grid">
+          <section class="card callout">
+            <h2>Check RTX 5060 with your CPU</h2>
+            <p>Open the main CalcBottleneck tool with the RTX 5060 already selected. Choose your processor, adjust resolution and target FPS, and compare the result against the guidance on this page.</p>
+            <div class="cta-row">
+              <a class="cta" href="/?gpu=rtx-5060&resolution=1080p#calculator">Check RTX 5060 with my CPU</a>
+              <a class="cta secondary" href="/methodology/">How the estimate works</a>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>RTX 5060 at a glance</h2>
+            <p>NVIDIA’s official specifications list the RTX 5060 with 8 GB of GDDR7 memory and the Blackwell architecture. NVIDIA’s current Studio desktop comparison table lists the RTX 5060 in the 1080p gaming tier. At 1080p, a capable GPU can finish frames quickly enough that the CPU and target frame rate become especially important to the pairing.</p>
+            <div class="spec-grid">
+              <div class="spec"><small>Architecture</small><strong>Blackwell</strong></div>
+              <div class="spec"><small>Graphics memory</small><strong>8 GB GDDR7</strong></div>
+              <div class="spec"><small>Useful starting point</small><strong>1080p</strong></div>
+            </div>
+            <p class="source-note">GPU architecture and memory specifications are based on NVIDIA’s official product specifications. The resolution label is a starting point from NVIDIA’s current desktop Studio comparison table, not a guarantee for every game or setting. <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5060-family/">View NVIDIA’s official RTX 5060 specifications</a>. See also <a href="https://www.nvidia.com/en-us/studio/compare-gpus/">NVIDIA’s desktop Studio GPU comparison</a>.</p>
+          </section>
+
+          <div class="two-col">
+            <section class="card">
+              <h2>Where a CPU limit is most likely to show up</h2>
+              <ul>
+                <li>1080p or reduced graphics settings where the GPU can finish frames quickly.</li>
+                <li>144 Hz, 165 Hz, 240 Hz or higher targets where the CPU must prepare more frames every second.</li>
+                <li>Simulation-heavy, strategy, MMO, large multiplayer or draw-call-heavy scenes.</li>
+                <li>Gaming while streaming, compiling, encoding or running other heavy background tasks.</li>
+              </ul>
+            </section>
+            <section class="card">
+              <h2>Where the GPU is more likely to be the limit</h2>
+              <ul>
+                <li>Higher resolutions and demanding native-resolution rendering.</li>
+                <li>Ray tracing, high-quality shadows, effects and other GPU-heavy settings.</li>
+                <li>Games where lowering resolution or graphics quality produces a large FPS increase.</li>
+                <li>Workloads that keep GPU utilization high while the CPU still has useful headroom.</li>
+              </ul>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2>Common RTX 5060 CPU pairing checks</h2>
+            <p>These are not blanket “good” or “bad” verdicts. They are common comparison points that cover older platforms, mainstream upgrades and high-end gaming CPUs. Each link opens CalcBottleneck with both parts preselected so you can set the resolution and target FPS that actually matter to you.</p>
+            <div class="pairing-list">
+              <div class="pairing">
+                <div><strong>Ryzen 5 3600 + RTX 5060</strong><br /><span>Older AM4 pairing where high-refresh CPU limits are worth testing.</span></div>
+                <a href="/?cpu=ryzen-5-3600&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 5 5600 + RTX 5060</strong><br /><span>Popular AM4 value pairing for a 1080p-focused upgrade.</span></div>
+                <a href="/?cpu=ryzen-5-5600&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Core i5-12400F + RTX 5060</strong><br /><span>Mainstream Intel pairing with a strong value focus.</span></div>
+                <a href="/?cpu=i5-12400f&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 5 7600 + RTX 5060</strong><br /><span>Modern midrange CPU with additional high-refresh headroom.</span></div>
+                <a href="/?cpu=ryzen-5-7600&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Core i5-13600K + RTX 5060</strong><br /><span>Higher-throughput option for gaming plus heavier background work.</span></div>
+                <a href="/?cpu=i5-13600k&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 7 7800X3D + RTX 5060</strong><br /><span>High-end gaming comparison where the GPU is likely to matter more.</span></div>
+                <a href="/?cpu=ryzen-7-7800x3d&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Resolution matters more than a single bottleneck percentage</h2>
+            <div class="three-col">
+              <div>
+                <h3>1080p</h3>
+                <p>Lower per-frame GPU load can expose the CPU sooner, especially when chasing high frame rates. This is the resolution where an older CPU is most likely to matter.</p>
+              </div>
+              <div>
+                <h3>1440p</h3>
+                <p>GPU load usually rises, so the balance often moves toward the graphics card. CPU-sensitive games and very high FPS targets can still remain processor-limited.</p>
+              </div>
+              <div>
+                <h3>4K</h3>
+                <p>The GPU normally performs substantially more rendering work per frame. That often reduces the size of a CPU mismatch, but it does not make the CPU irrelevant.</p>
+              </div>
+            </div>
+            <p>For the underlying reasoning, read <a href="/bottleneck-and-resolution/">how 1080p, 1440p and 4K change CPU/GPU bottlenecks</a>.</p>
+          </section>
+
+          <section class="card">
+            <h2>Do not confuse VRAM pressure with a CPU bottleneck</h2>
+            <p>The RTX 5060 has 8 GB of VRAM. In games or creator workloads that need more graphics memory than is available, texture quality, ray tracing or other memory-heavy settings can cause stutter or reduced performance. That is a VRAM/settings constraint, not automatically evidence of a CPU bottleneck.</p>
+            <p class="notice">A bottleneck estimate is a decision-support tool, not a benchmark of one specific game. If you are about to spend money, confirm the result with repeatable tests in the games or applications you actually use.</p>
+          </section>
+
+          <section class="card">
+            <h2>RTX 5060 pairing questions</h2>
+            <div class="faq">
+              <h3>Will a Ryzen 5 5600 bottleneck an RTX 5060?</h3>
+              <p>Often the more useful question is whether the pairing reaches your target FPS. At 1080p, a Ryzen 5 5600 can show more CPU pressure in very high-refresh or CPU-heavy games, while GPU-heavy titles may remain graphics-limited. Check the exact game class and FPS target rather than treating the pairing as universally good or bad.</p>
+            </div>
+            <div class="faq">
+              <h3>Is a Ryzen 5 3600 too old for an RTX 5060?</h3>
+              <p>Not automatically. A Ryzen 5 3600 can still run many games, but it has less CPU headroom than newer processors when chasing high frame rates. If you already own one, test the real workload first; a platform upgrade is most valuable when the CPU is measurably preventing you from reaching your target.</p>
+            </div>
+            <div class="faq">
+              <h3>Does the RTX 5060’s 8 GB VRAM count as a bottleneck?</h3>
+              <p>VRAM capacity is a different kind of limit. If a workload exceeds the available graphics memory, you may see stutter, texture issues or reduced performance even when the CPU and GPU compute balance is otherwise reasonable. Lowering memory-heavy settings can help distinguish VRAM pressure from a CPU bottleneck.</p>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Related guides</h2>
+            <ul>
+              <li><a href="/cpu-vs-gpu-bottleneck/">CPU bottleneck vs GPU bottleneck: how to tell the difference</a></li>
+              <li><a href="/bottleneck-and-resolution/">How 1080p, 1440p and 4K affect bottlenecks</a></li>
+              <li><a href="/how-to-fix-pc-bottleneck/">How to reduce a CPU or GPU bottleneck</a></li>
+              <li><a href="/rtx-5070-bottleneck/">RTX 5070 CPU pairing guide</a></li>
+              <li><a href="/rtx-5070-ti-bottleneck/">RTX 5070 Ti CPU pairing guide</a></li>
+            </ul>
+          </section>
+        </div>
+
+        <a class="back" href="/#calculator">← Back to the bottleneck calculator</a>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <span>© {new Date().getFullYear()} CalcBottleneck</span>
+          <div class="footer-links">
+            <a href="/">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/terms/">Terms</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link {
+    position: fixed; top: 12px; left: 12px; z-index: 9999; padding: 10px 14px;
+    border-radius: 10px; background: #fff; color: #07101f; font-weight: 800;
+    transform: translateY(-160%); transition: transform .18s ease;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  .shell { min-height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(37,99,235,.12), transparent 34%), linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(7,16,31,.9); }
+  .header-inner { width: min(1080px,92%); min-height: 72px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover { color:#fff; }
+  main { width:min(960px,92%); margin:0 auto; padding:72px 0 90px; }
+  .eyebrow { color:#78aaff; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.3rem,6vw,4rem); line-height:1.05; letter-spacing:-.045em; }
+  .lede { max-width:820px; margin:0; color:#a8b7cb; font-size:1.05rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .content-grid { display:grid; gap:18px; margin-top:42px; }
+  .card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .card h2 { margin:0 0 12px; font-size:1.45rem; letter-spacing:-.025em; }
+  .card h3 { margin:22px 0 8px; font-size:1.05rem; }
+  .card p { margin:10px 0 0; color:#9eadc2; }
+  .card ul, .card ol { margin:12px 0 0; padding-left:22px; color:#9eadc2; }
+  .card li + li { margin-top:8px; }
+  .card a { color:#78aaff; font-weight:700; }
+  .two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .three-col { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+  .callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .notice { padding:15px 16px; border-left:3px solid #78aaff; border-radius:0 12px 12px 0; background:rgba(37,99,235,.09); color:#b7c6d8; }
+  .cta-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
+  .cta { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 17px; border-radius:12px; background:#5f9dff; color:#07101f !important; text-decoration:none; font-weight:850 !important; }
+  .cta.secondary { border:1px solid rgba(120,170,255,.28); background:rgba(37,99,235,.1); color:#9fc2ff !important; }
+  .spec-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px; }
+  .spec { padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:14px; background:rgba(7,16,31,.55); }
+  .spec small { display:block; color:#778ca8; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+  .spec strong { display:block; margin-top:4px; font-size:1rem; }
+  .pairing-list { display:grid; gap:10px; margin-top:16px; }
+  .pairing { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:14px 15px; border:1px solid rgba(255,255,255,.07); border-radius:14px; background:rgba(7,16,31,.48); }
+  .pairing span { color:#9eadc2; }
+  .pairing a { white-space:nowrap; text-decoration:none; }
+  .faq h3 { margin-top:0; }
+  .faq + .faq { margin-top:18px; padding-top:18px; border-top:1px solid rgba(255,255,255,.07); }
+  .source-note { font-size:.86rem; color:#8194ad !important; }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  footer { border-top:1px solid rgba(255,255,255,.07); }
+  .footer-inner { width:min(1080px,92%); margin:0 auto; padding:28px 0 34px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; color:#77899f; font-size:.82rem; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:14px; }
+  .footer-links a { text-decoration:none; }
+  .footer-links a:hover { color:#fff; }
+  @media (max-width:780px) {
+    .three-col, .spec-grid { grid-template-columns:1fr; }
+  }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .two-col { grid-template-columns:1fr; }
+    main { padding-top:52px; }
+    .card { padding:22px 18px; }
+    .pairing { align-items:flex-start; flex-direction:column; }
+  }
+</style>

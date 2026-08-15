@@ -57,7 +57,7 @@ const faqItems = [
   {
     question: "How should I use the upgrade recommendations?",
     answer:
-      "Treat them as a shortlist, not a purchase guarantee. Before buying, confirm motherboard socket support, BIOS compatibility, power-supply capacity, physical dimensions, cooling, and local pricing.",
+      "Treat them as a shortlist, not a purchase guarantee. Before buying, confirm motherboard socket support, BIOS compatibility, power-supply capacity, physical dimensions, cooling, and local pricing. For current GeForce pairing context, CalcBottleneck also has dedicated RTX 5060, RTX 5070, and RTX 5070 Ti CPU pairing guides.",
   },
   {
     question: "Why do some older parts have lower estimate confidence?",
@@ -1448,7 +1448,10 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
               <p>
                 Treat them as a shortlist, not a purchase guarantee. Before buying, confirm motherboard socket
                 support, BIOS compatibility, power-supply capacity, physical dimensions, cooling, and local
-                pricing. Retailer buttons are search links rather than live-price or stock guarantees.
+                pricing. Retailer buttons are search links rather than live-price or stock guarantees. For current
+                GeForce pairing context, see the <a href="/rtx-5060-bottleneck/">RTX 5060</a>,
+                <a href="/rtx-5070-bottleneck/">RTX 5070</a>, and
+                <a href="/rtx-5070-ti-bottleneck/">RTX 5070 Ti</a> CPU pairing guides.
               </p>
             </details>
 
@@ -5060,6 +5063,44 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
     syncSmartPicker("gpu");
   });
 
+  function selectHasValue(select: HTMLSelectElement | null, value: string) {
+    return Boolean(select && Array.from(select.options).some((option) => option.value === value));
+  }
+
+  function syncVisualControl(select: HTMLSelectElement | null) {
+    if (!select) return;
+    const group = document.querySelector(`[data-control="${select.id}"]`);
+    if (!group) return;
+
+    group.querySelectorAll("[data-value]").forEach((node) => {
+      const button = node as HTMLElement;
+      button.classList.toggle("active", button.dataset.value === select.value);
+    });
+  }
+
+  function applyUrlPrefill() {
+    const params = new URLSearchParams(window.location.search);
+
+    const setFromParam = (select: HTMLSelectElement | null, key: string) => {
+      const value = params.get(key);
+      if (!value || !select || !selectHasValue(select, value)) return;
+      select.value = value;
+    };
+
+    setFromParam(cpuSelect, "cpu");
+    setFromParam(gpuSelect, "gpu");
+    setFromParam(resolutionSelect, "resolution");
+    setFromParam(purposeSelect, "purpose");
+    setFromParam(ramSelect, "ram");
+    setFromParam(fpsSelect, "fps");
+
+    syncVisualControl(resolutionSelect);
+    syncVisualControl(purposeSelect);
+    syncVisualControl(ramSelect);
+    syncVisualControl(fpsSelect);
+  }
+
+  applyUrlPrefill();
   filterHardwareByBrand(cpuBrandSelect, cpuSelect);
   filterHardwareByBrand(gpuBrandSelect, gpuSelect);
   updateCpuProfile();

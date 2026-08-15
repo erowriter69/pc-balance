@@ -1,0 +1,330 @@
+---
+import { SITE, absoluteUrl } from "../site-config";
+
+const title = 'RTX 5070 Ti Bottleneck Calculator & CPU Guide | CalcBottleneck';
+const description = 'Check whether your CPU can keep up with the RTX 5070 Ti at 1080p, 1440p and 4K. Compare common CPUs and test your exact gaming target.';
+const canonicalUrl = absoluteUrl('/rtx-5070-ti-bottleneck/');
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": `${canonicalUrl}#article`,
+      url: canonicalUrl,
+      headline: title,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      mainEntityOfPage: canonicalUrl,
+      author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      publisher: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      datePublished: "2026-08-15",
+      dateModified: SITE.lastReviewed,
+      about: [
+        { "@type": "Thing", name: "RTX 5070 Ti" },
+        { "@type": "Thing", name: "CPU bottleneck" },
+        { "@type": "Thing", name: "GPU bottleneck" }
+      ],
+      isPartOf: {
+        "@type": "WebSite",
+        "@id": `${absoluteUrl("/")}#website`,
+        name: SITE.name,
+        url: absoluteUrl("/"),
+      },
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "CalcBottleneck", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "RTX 5070 Ti Bottleneck Guide", item: canonicalUrl },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="CalcBottleneck CPU & GPU Bottleneck Calculator" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>CalcBottleneck</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">CalcBottleneck</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">RTX 5070 Ti Bottleneck Guide</span>
+        </nav>
+        <span class="eyebrow">RTX 5070 TI CPU PAIRING GUIDE</span>
+        <h1>RTX 5070 Ti Bottleneck Calculator & CPU Pairing Guide</h1>
+        <p class="lede">The GeForce RTX 5070 Ti is a 16 GB GDDR7 Blackwell graphics card with enough graphics headroom that CPU choice can matter sharply at lower resolutions and very high frame rates. At 4K the GPU usually carries more of the rendering load, but the exact balance still depends on the game and target FPS.</p>
+        <div class="meta-row"><span class="meta-chip">RTX 5070 Ti</span><span class="meta-chip">CPU pairing</span><span class="meta-chip">1080p / 1440p / 4K</span><span class="meta-chip">Upgrade guidance</span></div>
+
+        <div class="content-grid">
+          <section class="card callout">
+            <h2>Check RTX 5070 Ti with your CPU</h2>
+            <p>Open the main CalcBottleneck tool with the RTX 5070 Ti already selected. Choose your processor, adjust resolution and target FPS, and compare the result against the guidance on this page.</p>
+            <div class="cta-row">
+              <a class="cta" href="/?gpu=rtx-5070-ti&resolution=4k#calculator">Check RTX 5070 Ti with my CPU</a>
+              <a class="cta secondary" href="/methodology/">How the estimate works</a>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>RTX 5070 Ti at a glance</h2>
+            <p>NVIDIA’s official specifications list the RTX 5070 Ti with 16 GB of GDDR7 memory on the Blackwell architecture. NVIDIA’s current Studio desktop comparison table lists it in the 4K gaming tier. Higher resolution generally increases GPU work per frame, but a strong CPU can still matter for high-refresh targets, simulation-heavy games, large multiplayer scenes and background streaming tasks.</p>
+            <div class="spec-grid">
+              <div class="spec"><small>Architecture</small><strong>Blackwell</strong></div>
+              <div class="spec"><small>Graphics memory</small><strong>16 GB GDDR7</strong></div>
+              <div class="spec"><small>Useful starting point</small><strong>4K</strong></div>
+            </div>
+            <p class="source-note">GPU architecture and memory specifications are based on NVIDIA’s official product specifications. The resolution label is a starting point from NVIDIA’s current desktop Studio comparison table, not a guarantee for every game or setting. <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5070-family/">View NVIDIA’s official RTX 5070 Ti specifications</a>. See also <a href="https://www.nvidia.com/en-us/studio/compare-gpus/">NVIDIA’s desktop Studio GPU comparison</a>.</p>
+          </section>
+
+          <div class="two-col">
+            <section class="card">
+              <h2>Where a CPU limit is most likely to show up</h2>
+              <ul>
+                <li>1080p or reduced graphics settings where the GPU can finish frames quickly.</li>
+                <li>144 Hz, 165 Hz, 240 Hz or higher targets where the CPU must prepare more frames every second.</li>
+                <li>Simulation-heavy, strategy, MMO, large multiplayer or draw-call-heavy scenes.</li>
+                <li>Gaming while streaming, compiling, encoding or running other heavy background tasks.</li>
+              </ul>
+            </section>
+            <section class="card">
+              <h2>Where the GPU is more likely to be the limit</h2>
+              <ul>
+                <li>Higher resolutions and demanding native-resolution rendering.</li>
+                <li>Ray tracing, high-quality shadows, effects and other GPU-heavy settings.</li>
+                <li>Games where lowering resolution or graphics quality produces a large FPS increase.</li>
+                <li>Workloads that keep GPU utilization high while the CPU still has useful headroom.</li>
+              </ul>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2>Common RTX 5070 Ti CPU pairing checks</h2>
+            <p>These are not blanket “good” or “bad” verdicts. They are common comparison points that cover older platforms, mainstream upgrades and high-end gaming CPUs. Each link opens CalcBottleneck with both parts preselected so you can set the resolution and target FPS that actually matter to you.</p>
+            <div class="pairing-list">
+              <div class="pairing">
+                <div><strong>Ryzen 5 5600 + RTX 5070 Ti</strong><br /><span>Useful AM4 upgrade check, especially before buying a new platform.</span></div>
+                <a href="/?cpu=ryzen-5-5600&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 7 5700X3D + RTX 5070 Ti</strong><br /><span>High-value AM4 gaming upgrade comparison.</span></div>
+                <a href="/?cpu=ryzen-7-5700x3d&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 5 7600 + RTX 5070 Ti</strong><br /><span>Modern midrange AM5 pairing to test across 1440p and 4K.</span></div>
+                <a href="/?cpu=ryzen-5-7600&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Core i5-14600K + RTX 5070 Ti</strong><br /><span>Strong high-refresh and mixed-workload Intel comparison.</span></div>
+                <a href="/?cpu=i5-14600k&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 7 7800X3D + RTX 5070 Ti</strong><br /><span>High-end gaming pairing with substantial CPU headroom.</span></div>
+                <a href="/?cpu=ryzen-7-7800x3d&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Ryzen 7 9800X3D + RTX 5070 Ti</strong><br /><span>Very high gaming-CPU headroom for high-refresh comparisons.</span></div>
+                <a href="/?cpu=ryzen-7-9800x3d&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Resolution matters more than a single bottleneck percentage</h2>
+            <div class="three-col">
+              <div>
+                <h3>1080p</h3>
+                <p>Lower per-frame GPU load can expose the CPU sooner, especially when chasing high frame rates. This is the resolution where an older CPU is most likely to matter.</p>
+              </div>
+              <div>
+                <h3>1440p</h3>
+                <p>GPU load usually rises, so the balance often moves toward the graphics card. CPU-sensitive games and very high FPS targets can still remain processor-limited.</p>
+              </div>
+              <div>
+                <h3>4K</h3>
+                <p>The GPU normally performs substantially more rendering work per frame. That often reduces the size of a CPU mismatch, but it does not make the CPU irrelevant.</p>
+              </div>
+            </div>
+            <p>For the underlying reasoning, read <a href="/bottleneck-and-resolution/">how 1080p, 1440p and 4K change CPU/GPU bottlenecks</a>.</p>
+          </section>
+
+          <section class="card">
+            <h2>Do not confuse VRAM pressure with a CPU bottleneck</h2>
+            <p>The RTX 5070 Ti has 16 GB of graphics memory. That provides more memory headroom than the RTX 5070 or RTX 5060, but VRAM capacity still does not guarantee that every game will be GPU-limited. CPU scheduling, game-engine behavior, ray tracing, upscaling and the FPS target all influence the final balance.</p>
+            <p class="notice">A bottleneck estimate is a decision-support tool, not a benchmark of one specific game. If you are about to spend money, confirm the result with repeatable tests in the games or applications you actually use.</p>
+          </section>
+
+          <section class="card">
+            <h2>RTX 5070 Ti pairing questions</h2>
+            <div class="faq">
+              <h3>Will a Ryzen 5 5600 bottleneck an RTX 5070 Ti?</h3>
+              <p>It can become the limiting component sooner at 1080p or high refresh rates, especially in CPU-heavy games. At 4K, the RTX 5070 Ti usually has more rendering work to do per frame, which can reduce the relative CPU pressure. If you already own a Ryzen 5 5600, test the games and frame-rate target you actually use before replacing the platform.</p>
+            </div>
+            <div class="faq">
+              <h3>Do I need a Ryzen X3D CPU for an RTX 5070 Ti?</h3>
+              <p>No. X3D CPUs are strong gaming options, but an RTX 5070 Ti does not require one. A modern midrange or upper-midrange CPU can make sense depending on resolution and frame-rate goals. The value of an X3D upgrade is highest when your current CPU is the measured limit in the games you care about.</p>
+            </div>
+            <div class="faq">
+              <h3>Is an RTX 5070 Ti less CPU-limited at 4K?</h3>
+              <p>Usually, raising resolution increases the amount of GPU work per frame, so the system tends to become more GPU-limited. That does not make the CPU irrelevant: very high FPS targets, simulation-heavy games, draw-call-heavy scenes and background workloads can still expose a CPU limit.</p>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Related guides</h2>
+            <ul>
+              <li><a href="/cpu-vs-gpu-bottleneck/">CPU bottleneck vs GPU bottleneck: how to tell the difference</a></li>
+              <li><a href="/bottleneck-and-resolution/">How 1080p, 1440p and 4K affect bottlenecks</a></li>
+              <li><a href="/how-to-fix-pc-bottleneck/">How to reduce a CPU or GPU bottleneck</a></li>
+              <li><a href="/rtx-5060-bottleneck/">RTX 5060 CPU pairing guide</a></li>
+              <li><a href="/rtx-5070-bottleneck/">RTX 5070 CPU pairing guide</a></li>
+            </ul>
+          </section>
+        </div>
+
+        <a class="back" href="/#calculator">← Back to the bottleneck calculator</a>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <span>© {new Date().getFullYear()} CalcBottleneck</span>
+          <div class="footer-links">
+            <a href="/">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/terms/">Terms</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link {
+    position: fixed; top: 12px; left: 12px; z-index: 9999; padding: 10px 14px;
+    border-radius: 10px; background: #fff; color: #07101f; font-weight: 800;
+    transform: translateY(-160%); transition: transform .18s ease;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  .shell { min-height: 100vh; background: radial-gradient(circle at 50% 0%, rgba(37,99,235,.12), transparent 34%), linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(7,16,31,.9); }
+  .header-inner { width: min(1080px,92%); min-height: 72px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover { color:#fff; }
+  main { width:min(960px,92%); margin:0 auto; padding:72px 0 90px; }
+  .eyebrow { color:#78aaff; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.3rem,6vw,4rem); line-height:1.05; letter-spacing:-.045em; }
+  .lede { max-width:820px; margin:0; color:#a8b7cb; font-size:1.05rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .content-grid { display:grid; gap:18px; margin-top:42px; }
+  .card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .card h2 { margin:0 0 12px; font-size:1.45rem; letter-spacing:-.025em; }
+  .card h3 { margin:22px 0 8px; font-size:1.05rem; }
+  .card p { margin:10px 0 0; color:#9eadc2; }
+  .card ul, .card ol { margin:12px 0 0; padding-left:22px; color:#9eadc2; }
+  .card li + li { margin-top:8px; }
+  .card a { color:#78aaff; font-weight:700; }
+  .two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .three-col { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+  .callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .notice { padding:15px 16px; border-left:3px solid #78aaff; border-radius:0 12px 12px 0; background:rgba(37,99,235,.09); color:#b7c6d8; }
+  .cta-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:20px; }
+  .cta { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 17px; border-radius:12px; background:#5f9dff; color:#07101f !important; text-decoration:none; font-weight:850 !important; }
+  .cta.secondary { border:1px solid rgba(120,170,255,.28); background:rgba(37,99,235,.1); color:#9fc2ff !important; }
+  .spec-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px; }
+  .spec { padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:14px; background:rgba(7,16,31,.55); }
+  .spec small { display:block; color:#778ca8; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+  .spec strong { display:block; margin-top:4px; font-size:1rem; }
+  .pairing-list { display:grid; gap:10px; margin-top:16px; }
+  .pairing { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:14px 15px; border:1px solid rgba(255,255,255,.07); border-radius:14px; background:rgba(7,16,31,.48); }
+  .pairing span { color:#9eadc2; }
+  .pairing a { white-space:nowrap; text-decoration:none; }
+  .faq h3 { margin-top:0; }
+  .faq + .faq { margin-top:18px; padding-top:18px; border-top:1px solid rgba(255,255,255,.07); }
+  .source-note { font-size:.86rem; color:#8194ad !important; }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  footer { border-top:1px solid rgba(255,255,255,.07); }
+  .footer-inner { width:min(1080px,92%); margin:0 auto; padding:28px 0 34px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; color:#77899f; font-size:.82rem; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:14px; }
+  .footer-links a { text-decoration:none; }
+  .footer-links a:hover { color:#fff; }
+  @media (max-width:780px) {
+    .three-col, .spec-grid { grid-template-columns:1fr; }
+  }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .two-col { grid-template-columns:1fr; }
+    main { padding-top:52px; }
+    .card { padding:22px 18px; }
+    .pairing { align-items:flex-start; flex-direction:column; }
+  }
+</style>
