@@ -1,9 +1,10 @@
 ---
-import { SITE, absoluteUrl } from "../site-config";
+import { SITE, SITE_PAGE_LASTMOD, absoluteUrl } from "../site-config";
 
 const title = 'RTX 5070 Ti Bottleneck Calculator & CPU Guide | CalcBottleneck';
-const description = 'Check whether your CPU can keep up with the RTX 5070 Ti at 1080p, 1440p and 4K. Compare common CPUs and test your exact gaming target.';
+const description = 'RTX 5070 Ti bottleneck calculator and CPU pairing guide for 1080p, 1440p and 4K. Check Ryzen and Intel pairings, target FPS and upgrade needs.';
 const canonicalUrl = absoluteUrl('/rtx-5070-ti-bottleneck/');
+const pageLastModified = SITE_PAGE_LASTMOD['/rtx-5070-ti-bottleneck/'];
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -19,7 +20,7 @@ const structuredData = {
       author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
       publisher: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
       datePublished: "2026-08-15",
-      dateModified: SITE.lastReviewed,
+      dateModified: pageLastModified,
       about: [
         { "@type": "Thing", name: "RTX 5070 Ti" },
         { "@type": "Thing", name: "CPU bottleneck" },
@@ -114,8 +115,14 @@ const structuredData = {
           </section>
 
           <section class="card">
+            <h2>Will your CPU bottleneck an RTX 5070 Ti?</h2>
+            <p>There is no single percentage that answers this for every PC. The RTX 5070 Ti can expose an older or slower CPU sooner at 1080p and high refresh rates because the processor has to prepare frames quickly. At 1440p the answer depends heavily on the game and FPS target, while 4K usually shifts more work toward the GPU.</p>
+            <p>The useful question is whether your CPU keeps you below the performance target you actually care about. Test the exact processor above, then compare the result with your resolution, workload and target FPS instead of treating one generic bottleneck number as a verdict.</p>
+          </section>
+
+          <section class="card">
             <h2>RTX 5070 Ti at a glance</h2>
-            <p>NVIDIA’s official specifications list the RTX 5070 Ti with 16 GB of GDDR7 memory on the Blackwell architecture. NVIDIA’s current Studio desktop comparison table lists it in the 4K gaming tier. Higher resolution generally increases GPU work per frame, but a strong CPU can still matter for high-refresh targets, simulation-heavy games, large multiplayer scenes and background streaming tasks.</p>
+            <p>NVIDIA’s official specifications list the RTX 5070 Ti with 8,960 CUDA cores, 16 GB of GDDR7 memory, a 256-bit memory interface and the Blackwell architecture. NVIDIA’s current Studio desktop comparison table lists it in the 4K gaming tier. Higher resolution generally increases GPU work per frame, but a strong CPU can still matter for high-refresh targets, simulation-heavy games, large multiplayer scenes and background streaming tasks.</p>
             <div class="spec-grid">
               <div class="spec"><small>Architecture</small><strong>Blackwell</strong></div>
               <div class="spec"><small>Graphics memory</small><strong>16 GB GDDR7</strong></div>
@@ -152,6 +159,10 @@ const structuredData = {
               <div class="pairing">
                 <div><strong>Ryzen 5 5600 + RTX 5070 Ti</strong><br /><span>Useful AM4 upgrade check, especially before buying a new platform.</span></div>
                 <a href="/?cpu=ryzen-5-5600&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
+              </div>
+              <div class="pairing">
+                <div><strong>Core i5-12400F + RTX 5070 Ti</strong><br /><span>Mainstream Intel pairing where 1080p high-refresh targets deserve a separate check.</span></div>
+                <a href="/?cpu=i5-12400f&gpu=rtx-5070-ti&resolution=4k#calculator">Test this pairing →</a>
               </div>
               <div class="pairing">
                 <div><strong>Ryzen 7 5700X3D + RTX 5070 Ti</strong><br /><span>High-value AM4 gaming upgrade comparison.</span></div>
@@ -196,6 +207,12 @@ const structuredData = {
           </section>
 
           <section class="card">
+            <h2>DLSS and frame generation can change where the limit appears</h2>
+            <p>Upscaling can reduce the GPU’s internal rendering workload, which may expose a CPU limit sooner when the system is already capable of high frame rates. Frame generation can raise displayed frame rate, but it does not remove the CPU work needed for game simulation, draw calls and the normally rendered base frames.</p>
+            <p>For that reason, compare CPU/GPU balance using the settings you actually plan to play with. A PC that is GPU-limited at native 4K can behave differently after aggressive upscaling or when targeting a much higher refresh rate.</p>
+          </section>
+
+          <section class="card">
             <h2>Do not confuse VRAM pressure with a CPU bottleneck</h2>
             <p>The RTX 5070 Ti has 16 GB of graphics memory. That provides more memory headroom than the RTX 5070 or RTX 5060, but VRAM capacity still does not guarantee that every game will be GPU-limited. CPU scheduling, game-engine behavior, ray tracing, upscaling and the FPS target all influence the final balance.</p>
             <p class="notice">A bottleneck estimate is a decision-support tool, not a benchmark of one specific game. If you are about to spend money, confirm the result with repeatable tests in the games or applications you actually use.</p>
@@ -206,6 +223,10 @@ const structuredData = {
             <div class="faq">
               <h3>Will a Ryzen 5 5600 bottleneck an RTX 5070 Ti?</h3>
               <p>It can become the limiting component sooner at 1080p or high refresh rates, especially in CPU-heavy games. At 4K, the RTX 5070 Ti usually has more rendering work to do per frame, which can reduce the relative CPU pressure. If you already own a Ryzen 5 5600, test the games and frame-rate target you actually use before replacing the platform.</p>
+            </div>
+            <div class="faq">
+              <h3>Is a Core i5-12400F enough for an RTX 5070 Ti?</h3>
+              <p>It can be a sensible pairing when your priority is GPU-heavy gaming, especially at higher resolutions, but “enough” depends on the frame-rate target. A 60–120 FPS goal is very different from chasing 200+ FPS in competitive or CPU-heavy games. Test the exact pairing at your intended resolution before assuming the CPU needs to be replaced.</p>
             </div>
             <div class="faq">
               <h3>Do I need a Ryzen X3D CPU for an RTX 5070 Ti?</h3>
