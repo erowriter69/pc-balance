@@ -27,6 +27,22 @@ export const SITE_PAGES = [
   "/terms/",
 ] as const;
 
+export const SITE_PAGE_LASTMOD = {
+  "/": "2026-08-15",
+  "/cpu-vs-gpu-bottleneck/": "2026-08-22",
+  "/bottleneck-and-resolution/": "2026-08-15",
+  "/is-10-percent-bottleneck-bad/": "2026-08-15",
+  "/how-to-fix-pc-bottleneck/": "2026-08-15",
+  "/rtx-5070-bottleneck/": "2026-08-22",
+  "/rtx-5060-bottleneck/": "2026-08-22",
+  "/rtx-5060-ti-bottleneck/": "2026-08-22",
+  "/rtx-5070-ti-bottleneck/": "2026-08-22",
+  "/about/": "2026-08-15",
+  "/methodology/": "2026-08-15",
+  "/privacy/": "2026-08-15",
+  "/terms/": "2026-08-15",
+} as const satisfies Record<(typeof SITE_PAGES)[number], string>;
+
 export function absoluteUrl(path = "/") {
   return new URL(path, `${SITE.origin}/`).toString();
 }

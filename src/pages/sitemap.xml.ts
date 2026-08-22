@@ -1,4 +1,4 @@
-import { SITE, SITE_PAGES, absoluteUrl } from "../site-config";
+import { SITE_PAGES, SITE_PAGE_LASTMOD, absoluteUrl } from "../site-config";
 
 export const prerender = true;
 
@@ -14,7 +14,7 @@ export function GET() {
   const urls = SITE_PAGES.map(
     (path) => `  <url>
     <loc>${escapeXml(absoluteUrl(path))}</loc>
-    <lastmod>${SITE.lastReviewed}</lastmod>
+    <lastmod>${SITE_PAGE_LASTMOD[path]}</lastmod>
   </url>`,
   ).join("\n");
 
