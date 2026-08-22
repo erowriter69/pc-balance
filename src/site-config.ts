@@ -19,6 +19,7 @@ export const SITE_PAGES = [
   "/how-to-fix-pc-bottleneck/",
   "/rtx-5070-bottleneck/",
   "/rtx-5060-bottleneck/",
+  "/rtx-5060-ti-bottleneck/",
   "/rtx-5070-ti-bottleneck/",
   "/about/",
   "/methodology/",

@@ -1,9 +1,10 @@
 ---
 import { SITE, absoluteUrl } from "../site-config";
 
-const title = 'RTX 5060 Bottleneck Calculator & CPU Guide | CalcBottleneck';
-const description = 'Check CPU and RTX 5060 balance at 1080p, 1440p and 4K. Learn how target FPS and 8 GB VRAM affect the result, then test your exact pairing.';
-const canonicalUrl = absoluteUrl('/rtx-5060-bottleneck/');
+const title = 'RTX 5060 Ti Bottleneck Calculator (8GB & 16GB) | CalcBottleneck';
+const description = 'Check RTX 5060 Ti 8GB or 16GB CPU balance at 1080p, 1440p and 4K. Compare common CPU pairings, VRAM limits and target-FPS behavior.';
+const canonicalUrl = absoluteUrl('/rtx-5060-ti-bottleneck/');
+const articleDate = "2026-08-22";
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -18,10 +19,12 @@ const structuredData = {
       mainEntityOfPage: canonicalUrl,
       author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
       publisher: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
-      datePublished: "2026-08-15",
-      dateModified: SITE.lastReviewed,
+      datePublished: articleDate,
+      dateModified: articleDate,
       about: [
-        { "@type": "Thing", name: "RTX 5060" },
+        { "@type": "Thing", name: "RTX 5060 Ti" },
+        { "@type": "Thing", name: "RTX 5060 Ti 16GB" },
+        { "@type": "Thing", name: "RTX 5060 Ti 8GB" },
         { "@type": "Thing", name: "CPU bottleneck" },
         { "@type": "Thing", name: "GPU bottleneck" }
       ],
@@ -38,7 +41,7 @@ const structuredData = {
       "@id": `${canonicalUrl}#breadcrumb`,
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "CalcBottleneck", item: absoluteUrl("/") },
-        { "@type": "ListItem", position: 2, name: "RTX 5060 Bottleneck Guide", item: canonicalUrl },
+        { "@type": "ListItem", position: 2, name: "RTX 5060 Ti Bottleneck Guide", item: canonicalUrl },
       ],
     },
   ],
@@ -96,32 +99,49 @@ const structuredData = {
         <nav class="breadcrumb" aria-label="Breadcrumb">
           <a href="/">CalcBottleneck</a>
           <span aria-hidden="true">›</span>
-          <span aria-current="page">RTX 5060 Bottleneck Guide</span>
+          <span aria-current="page">RTX 5060 Ti Bottleneck Guide</span>
         </nav>
-        <span class="eyebrow">RTX 5060 CPU PAIRING GUIDE</span>
-        <h1>RTX 5060 Bottleneck Calculator & CPU Pairing Guide</h1>
-        <p class="lede">The GeForce RTX 5060 is an 8 GB GDDR7 Blackwell graphics card. It is a natural match for 1080p-focused systems, but CPU limits can become more visible when settings are lowered to chase high frame rates. Use this guide to separate CPU balance from GPU or VRAM limits and test your exact CPU.</p>
-        <div class="meta-row"><span class="meta-chip">RTX 5060</span><span class="meta-chip">CPU pairing</span><span class="meta-chip">1080p / 1440p / 4K</span><span class="meta-chip">Upgrade guidance</span></div>
+        <span class="eyebrow">RTX 5060 TI CPU PAIRING GUIDE</span>
+        <h1>RTX 5060 Ti Bottleneck Calculator & CPU Pairing Guide</h1>
+        <p class="lede">The GeForce RTX 5060 Ti is available with 8 GB or 16 GB of GDDR7 memory on NVIDIA’s Blackwell architecture. Both versions raise the same CPU-pairing question: can your processor keep up with the frame rate you actually want? This guide separates CPU limits from VRAM pressure and lets you test either RTX 5060 Ti model with your exact CPU.</p>
+        <div class="meta-row"><span class="meta-chip">RTX 5060 Ti</span><span class="meta-chip">8 GB / 16 GB</span><span class="meta-chip">CPU pairing</span><span class="meta-chip">1080p / 1440p / 4K</span></div>
 
         <div class="content-grid">
           <section class="card callout">
-            <h2>Check RTX 5060 with your CPU</h2>
-            <p>Open the main CalcBottleneck tool with the RTX 5060 already selected. Choose your processor, adjust resolution and target FPS, and compare the result against the guidance on this page.</p>
+            <h2>Check RTX 5060 Ti with your CPU</h2>
+            <p>Choose the RTX 5060 Ti version you own or plan to buy. CalcBottleneck will open with that GPU already selected; then choose your processor, resolution, workload and target FPS.</p>
             <div class="cta-row">
-              <a class="cta" href="/?gpu=rtx-5060&resolution=1080p#calculator">Check RTX 5060 with my CPU</a>
+              <a class="cta" href="/?gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Check RTX 5060 Ti 16GB</a>
+              <a class="cta secondary" href="/?gpu=rtx-5060-ti-8gb&resolution=1440p#calculator">Check RTX 5060 Ti 8GB</a>
               <a class="cta secondary" href="/methodology/">How the estimate works</a>
             </div>
           </section>
 
           <section class="card">
-            <h2>RTX 5060 at a glance</h2>
-            <p>NVIDIA’s official specifications list the RTX 5060 with 8 GB of GDDR7 memory and the Blackwell architecture. NVIDIA’s current Studio desktop comparison table lists the RTX 5060 in the 1080p gaming tier. At 1080p, a capable GPU can finish frames quickly enough that the CPU and target frame rate become especially important to the pairing.</p>
+            <h2>RTX 5060 Ti at a glance</h2>
+            <p>NVIDIA’s official specifications list the RTX 5060 Ti with 4,608 CUDA cores, the Blackwell architecture and a standard memory configuration of 16 GB or 8 GB of GDDR7 on a 128-bit memory interface. NVIDIA’s current desktop Studio comparison places both RTX 5060 Ti memory variants in its 1440p gaming tier. Treat 1440p as a useful starting point, not a guarantee for every game, graphics preset or frame-rate target.</p>
             <div class="spec-grid">
               <div class="spec"><small>Architecture</small><strong>Blackwell</strong></div>
-              <div class="spec"><small>Graphics memory</small><strong>8 GB GDDR7</strong></div>
-              <div class="spec"><small>Useful starting point</small><strong>1080p</strong></div>
+              <div class="spec"><small>Graphics memory</small><strong>16 GB / 8 GB GDDR7</strong></div>
+              <div class="spec"><small>Useful starting point</small><strong>1440p</strong></div>
             </div>
-            <p class="source-note">GPU architecture and memory specifications are based on NVIDIA’s official product specifications. The resolution label is a starting point from NVIDIA’s current desktop Studio comparison table, not a guarantee for every game or setting. <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5060-family/">View NVIDIA’s official RTX 5060 specifications</a>. See also <a href="https://www.nvidia.com/en-us/studio/compare-gpus/">NVIDIA’s desktop Studio GPU comparison</a>.</p>
+            <p class="source-note">GPU architecture, memory and engine specifications are based on NVIDIA’s official RTX 5060 family specifications. The resolution label comes from NVIDIA’s current desktop Studio comparison and is a starting point rather than a universal performance promise. <a href="https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5060-family/">View NVIDIA’s official RTX 5060 Ti specifications</a>. See also <a href="https://www.nvidia.com/en-us/studio/compare-gpus/">NVIDIA’s desktop Studio GPU comparison</a>.</p>
+          </section>
+
+          <section class="card">
+            <h2>RTX 5060 Ti 8GB vs 16GB: does the CPU pairing change?</h2>
+            <p>Not in the way a simple “bottleneck percentage” might suggest. NVIDIA lists the two memory capacities under the same RTX 5060 Ti GPU specification, so the basic CPU-side question remains the same: how quickly can the processor prepare the work needed for your target frame rate?</p>
+            <div class="two-col">
+              <div>
+                <h3>8 GB model</h3>
+                <p>The 8 GB card can encounter memory pressure sooner when a game or creator workload uses large textures, heavy ray tracing, high-resolution assets or other VRAM-intensive settings. When that happens, stutter or reduced performance can be a memory constraint rather than a CPU bottleneck.</p>
+              </div>
+              <div>
+                <h3>16 GB model</h3>
+                <p>The 16 GB card provides more graphics-memory headroom for VRAM-heavy workloads. Extra VRAM does not remove CPU limits, however: high-refresh gaming, simulation-heavy scenes and CPU-intensive background work can still make the processor the limiting stage.</p>
+              </div>
+            </div>
+            <p class="notice">If your workload fits comfortably inside 8 GB, the extra memory capacity does not automatically require a different CPU. Diagnose CPU balance and VRAM pressure as separate limits.</p>
           </section>
 
           <div class="two-col">
@@ -137,7 +157,7 @@ const structuredData = {
             <section class="card">
               <h2>Where the GPU is more likely to be the limit</h2>
               <ul>
-                <li>Higher resolutions and demanding native-resolution rendering.</li>
+                <li>1440p or 4K with demanding native-resolution rendering and high visual settings.</li>
                 <li>Ray tracing, high-quality shadows, effects and other GPU-heavy settings.</li>
                 <li>Games where lowering resolution or graphics quality produces a large FPS increase.</li>
                 <li>Workloads that keep GPU utilization high while the CPU still has useful headroom.</li>
@@ -146,32 +166,32 @@ const structuredData = {
           </div>
 
           <section class="card">
-            <h2>Common RTX 5060 CPU pairing checks</h2>
-            <p>These are not blanket “good” or “bad” verdicts. They are common comparison points that cover older platforms, mainstream upgrades and high-end gaming CPUs. Each link opens CalcBottleneck with both parts preselected so you can set the resolution and target FPS that actually matter to you.</p>
+            <h2>Common RTX 5060 Ti CPU pairing checks</h2>
+            <p>The pairing links below use the 16 GB model as the preselected GPU. The CPU-side diagnosis is the same for the 8 GB card; if you own the 8 GB model, use the dedicated button near the top of this page and choose the same processor. These checks are starting points, not blanket “good” or “bad” verdicts.</p>
             <div class="pairing-list">
               <div class="pairing">
-                <div><strong>Ryzen 5 3600 + RTX 5060</strong><br /><span>Older AM4 pairing where high-refresh CPU limits are worth testing.</span></div>
-                <a href="/?cpu=ryzen-5-3600&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+                <div><strong>Ryzen 5 3600 + RTX 5060 Ti</strong><br /><span>Older AM4 pairing where high-refresh 1080p CPU pressure is worth testing carefully.</span></div>
+                <a href="/?cpu=ryzen-5-3600&gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Test this pairing →</a>
               </div>
               <div class="pairing">
-                <div><strong>Ryzen 5 5600 + RTX 5060</strong><br /><span>Popular AM4 value pairing for a 1080p-focused upgrade.</span></div>
-                <a href="/?cpu=ryzen-5-5600&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+                <div><strong>Ryzen 5 5600 + RTX 5060 Ti</strong><br /><span>Popular AM4 upgrade check for users keeping an existing DDR4 platform.</span></div>
+                <a href="/?cpu=ryzen-5-5600&gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Test this pairing →</a>
               </div>
               <div class="pairing">
-                <div><strong>Core i5-12400F + RTX 5060</strong><br /><span>Mainstream Intel pairing with a strong value focus.</span></div>
-                <a href="/?cpu=i5-12400f&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+                <div><strong>Core i5-12400F + RTX 5060 Ti</strong><br /><span>Mainstream Intel pairing where target FPS matters more than a generic percentage.</span></div>
+                <a href="/?cpu=i5-12400f&gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Test this pairing →</a>
               </div>
               <div class="pairing">
-                <div><strong>Ryzen 5 7600 + RTX 5060</strong><br /><span>Modern midrange CPU with additional high-refresh headroom.</span></div>
-                <a href="/?cpu=ryzen-5-7600&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+                <div><strong>Ryzen 5 7600 + RTX 5060 Ti</strong><br /><span>Modern AM5 pairing with stronger CPU headroom for high-refresh gaming.</span></div>
+                <a href="/?cpu=ryzen-5-7600&gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Test this pairing →</a>
               </div>
               <div class="pairing">
-                <div><strong>Core i5-13600K + RTX 5060</strong><br /><span>Higher-throughput option for gaming plus heavier background work.</span></div>
-                <a href="/?cpu=i5-13600k&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+                <div><strong>Core i5-13600K + RTX 5060 Ti</strong><br /><span>Higher-throughput Intel option for gaming plus heavier background workloads.</span></div>
+                <a href="/?cpu=i5-13600k&gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Test this pairing →</a>
               </div>
               <div class="pairing">
-                <div><strong>Ryzen 7 7800X3D + RTX 5060</strong><br /><span>High-end gaming comparison where the GPU is likely to matter more.</span></div>
-                <a href="/?cpu=ryzen-7-7800x3d&gpu=rtx-5060&resolution=1080p#calculator">Test this pairing →</a>
+                <div><strong>Ryzen 7 7800X3D + RTX 5060 Ti</strong><br /><span>High-end gaming CPU comparison where GPU load is more likely to dominate many settings.</span></div>
+                <a href="/?cpu=ryzen-7-7800x3d&gpu=rtx-5060-ti-16gb&resolution=1440p#calculator">Test this pairing →</a>
               </div>
             </div>
           </section>
@@ -181,15 +201,15 @@ const structuredData = {
             <div class="three-col">
               <div>
                 <h3>1080p</h3>
-                <p>Lower per-frame GPU load can expose the CPU sooner, especially when chasing high frame rates. This is the resolution where an older CPU is most likely to matter.</p>
+                <p>Lower per-frame GPU load can expose the CPU sooner, especially when chasing high frame rates. Older processors are most likely to matter here.</p>
               </div>
               <div>
                 <h3>1440p</h3>
-                <p>GPU load usually rises, so the balance often moves toward the graphics card. CPU-sensitive games and very high FPS targets can still remain processor-limited.</p>
+                <p>This is a useful starting point for the RTX 5060 Ti. GPU load rises compared with 1080p, but CPU-sensitive games and high FPS targets can still remain processor-limited.</p>
               </div>
               <div>
                 <h3>4K</h3>
-                <p>The GPU normally performs substantially more rendering work per frame. That often reduces the size of a CPU mismatch, but it does not make the CPU irrelevant.</p>
+                <p>The GPU normally performs substantially more rendering work per frame. CPU mismatches often shrink, while GPU performance and VRAM use become more important.</p>
               </div>
             </div>
             <p>For the underlying reasoning, read <a href="/bottleneck-and-resolution/">how 1080p, 1440p and 4K change CPU/GPU bottlenecks</a>.</p>
@@ -197,23 +217,27 @@ const structuredData = {
 
           <section class="card">
             <h2>Do not confuse VRAM pressure with a CPU bottleneck</h2>
-            <p>The RTX 5060 has 8 GB of VRAM. In games or creator workloads that need more graphics memory than is available, texture quality, ray tracing or other memory-heavy settings can cause stutter or reduced performance. That is a VRAM/settings constraint, not automatically evidence of a CPU bottleneck.</p>
-            <p class="notice">A bottleneck estimate is a decision-support tool, not a benchmark of one specific game. If you are about to spend money, confirm the result with repeatable tests in the games or applications you actually use.</p>
+            <p>The 8 GB and 16 GB RTX 5060 Ti models make this distinction especially important. If a game exceeds available graphics memory, lowering texture quality, ray-tracing settings or other VRAM-heavy options may improve behavior even though the processor has not changed. Conversely, extra VRAM cannot fix a game that is already limited by CPU simulation, draw calls or a very high frame-rate target.</p>
+            <p class="notice">A bottleneck estimate is a decision-support tool, not a benchmark of one specific game. Before spending money, confirm the result with repeatable tests in the games or applications you actually use.</p>
           </section>
 
           <section class="card">
-            <h2>RTX 5060 pairing questions</h2>
+            <h2>RTX 5060 Ti pairing questions</h2>
             <div class="faq">
-              <h3>Will a Ryzen 5 5600 bottleneck an RTX 5060?</h3>
-              <p>Often the more useful question is whether the pairing reaches your target FPS. At 1080p, a Ryzen 5 5600 can show more CPU pressure in very high-refresh or CPU-heavy games, while GPU-heavy titles may remain graphics-limited. Check the exact game class and FPS target rather than treating the pairing as universally good or bad.</p>
+              <h3>Will a Ryzen 5 5600 bottleneck an RTX 5060 Ti?</h3>
+              <p>It can become the limiting component sooner at 1080p and high refresh rates, particularly in CPU-heavy games. At 1440p with demanding visual settings, more of the workload shifts toward the GPU. If you already own a Ryzen 5 5600, test your actual games and target FPS before assuming a platform upgrade is necessary.</p>
             </div>
             <div class="faq">
-              <h3>Is a Ryzen 5 3600 too old for an RTX 5060?</h3>
-              <p>Not automatically. A Ryzen 5 3600 can still run many games, but it has less CPU headroom than newer processors when chasing high frame rates. If you already own one, test the real workload first; a platform upgrade is most valuable when the CPU is measurably preventing you from reaching your target.</p>
+              <h3>Is a Core i5-12400F enough for an RTX 5060 Ti?</h3>
+              <p>It can be a sensible pairing for many games, especially when the target is moderate frame rates at 1440p. Competitive high-refresh play and CPU-heavy simulations are more likely to expose the processor. “Enough” should be judged against your actual FPS target rather than one universal bottleneck number.</p>
             </div>
             <div class="faq">
-              <h3>Does the RTX 5060’s 8 GB VRAM count as a bottleneck?</h3>
-              <p>VRAM capacity is a different kind of limit. If a workload exceeds the available graphics memory, you may see stutter, texture issues or reduced performance even when the CPU and GPU compute balance is otherwise reasonable. Lowering memory-heavy settings can help distinguish VRAM pressure from a CPU bottleneck.</p>
+              <h3>Do the RTX 5060 Ti 8GB and 16GB models need different CPUs?</h3>
+              <p>No special CPU tier is required simply because one version has more VRAM. The capacity difference mainly changes graphics-memory headroom. CPU demand still depends on the game engine, resolution, target frame rate and background workload.</p>
+            </div>
+            <div class="faq">
+              <h3>Does the 16GB RTX 5060 Ti eliminate bottlenecks?</h3>
+              <p>No. More VRAM can reduce memory-pressure problems in workloads that exceed 8 GB, but it cannot remove a CPU-side limit or guarantee a particular frame rate. CPU throughput, GPU rendering load, VRAM use and target FPS are separate parts of the performance picture.</p>
             </div>
           </section>
 
@@ -223,7 +247,7 @@ const structuredData = {
               <li><a href="/cpu-vs-gpu-bottleneck/">CPU bottleneck vs GPU bottleneck: how to tell the difference</a></li>
               <li><a href="/bottleneck-and-resolution/">How 1080p, 1440p and 4K affect bottlenecks</a></li>
               <li><a href="/how-to-fix-pc-bottleneck/">How to reduce a CPU or GPU bottleneck</a></li>
-              <li><a href="/rtx-5060-ti-bottleneck/">RTX 5060 Ti 8GB & 16GB CPU pairing guide</a></li>
+              <li><a href="/rtx-5060-bottleneck/">RTX 5060 CPU pairing guide</a></li>
               <li><a href="/rtx-5070-bottleneck/">RTX 5070 CPU pairing guide</a></li>
               <li><a href="/rtx-5070-ti-bottleneck/">RTX 5070 Ti CPU pairing guide</a></li>
             </ul>
