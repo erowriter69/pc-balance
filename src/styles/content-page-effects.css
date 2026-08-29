@@ -1,0 +1,265 @@
+/* CalcBottleneck content-page interaction polish.
+   Keeps informational pages visually aligned with the calculator without
+   changing their editorial layout or calculator logic. */
+
+body .shell .site-header {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 36px rgba(2, 8, 20, 0.1);
+}
+
+body .shell .brand,
+body .shell .brand-icon,
+body .shell .nav a,
+body .shell .meta-chip,
+body .shell .card,
+body .shell .snapshot-card,
+body .shell .spec,
+body .shell .pairing,
+body .shell .data-row,
+body .shell .cta,
+body .shell .back,
+body .shell .footer-links a {
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease,
+    box-shadow 0.22s ease,
+    color 0.22s ease,
+    opacity 0.22s ease;
+}
+
+body .shell .brand:hover {
+  transform: translateY(-1px);
+}
+
+body .shell .brand:hover .brand-icon {
+  transform: translateY(-1px) rotate(-4deg) scale(1.04);
+  border-color: rgba(120, 170, 255, 0.58);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.24);
+}
+
+body .shell .nav a:hover {
+  color: #ffffff;
+  transform: translateY(-1px);
+  text-shadow: 0 0 18px rgba(120, 170, 255, 0.24);
+}
+
+body .shell .meta-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(120, 170, 255, 0.38);
+  background: rgba(37, 99, 235, 0.13);
+  color: #b9cceb;
+}
+
+body .shell .card,
+body .shell .snapshot-card {
+  position: relative;
+  overflow: hidden;
+}
+
+body .shell .card::before,
+body .shell .snapshot-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 16% 0%, rgba(91, 151, 255, 0.09), transparent 38%);
+  transition: opacity 0.24s ease;
+}
+
+body .shell .card:hover,
+body .shell .snapshot-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 170, 255, 0.2);
+  box-shadow: 0 18px 42px rgba(1, 7, 18, 0.2);
+}
+
+body .shell .card:hover::before,
+body .shell .snapshot-card:hover::before {
+  opacity: 1;
+}
+
+body .shell .callout:hover,
+body .shell .snapshot-card.featured:hover {
+  border-color: rgba(120, 170, 255, 0.43);
+  box-shadow: 0 18px 46px rgba(21, 72, 160, 0.16);
+}
+
+body .shell .spec:hover,
+body .shell .pairing:hover {
+  transform: translateY(-1px);
+  border-color: rgba(120, 170, 255, 0.2);
+  background: rgba(11, 29, 53, 0.72);
+}
+
+body .shell .data-row:hover {
+  background: rgba(37, 99, 235, 0.07);
+}
+
+/* Primary and secondary CTAs share the homepage's lift/glow language. */
+body .shell .cta,
+body .shell .back {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+body .shell .cta::before,
+body .shell .back::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  left: -58%;
+  width: 42%;
+  transform: skewX(-20deg);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 24%,
+    rgba(255, 255, 255, 0.34) 50%,
+    rgba(255, 255, 255, 0.08) 76%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition:
+    left 0.62s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.12s ease;
+}
+
+body .shell .cta:hover::before,
+body .shell .back:hover::before {
+  left: 118%;
+  opacity: 1;
+}
+
+body .shell .cta:not(.secondary) {
+  border: 1px solid rgba(151, 194, 255, 0.44);
+  background: linear-gradient(135deg, #3977df, #5798ff);
+  color: #ffffff !important;
+  box-shadow: 0 11px 30px rgba(37, 99, 235, 0.22);
+}
+
+body .shell .cta:not(.secondary):hover {
+  transform: translateY(-2px);
+  border-color: rgba(178, 211, 255, 0.7);
+  box-shadow: 0 16px 38px rgba(37, 99, 235, 0.32);
+}
+
+body .shell .cta.secondary {
+  border-color: rgba(120, 170, 255, 0.3);
+  background: rgba(37, 99, 235, 0.1);
+  color: #aac9ff !important;
+}
+
+body .shell .cta.secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 170, 255, 0.53);
+  background: rgba(37, 99, 235, 0.17);
+  color: #ffffff !important;
+  box-shadow: 0 13px 32px rgba(10, 39, 92, 0.2);
+}
+
+body .shell .back {
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 15px;
+  border: 1px solid rgba(120, 170, 255, 0.22);
+  border-radius: 11px;
+  background: rgba(37, 99, 235, 0.07);
+  color: #8eb8ff;
+}
+
+body .shell .back:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 170, 255, 0.47);
+  background: rgba(37, 99, 235, 0.14);
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(7, 25, 58, 0.2);
+}
+
+body .shell .card a:not(.cta),
+body .shell .breadcrumb a {
+  text-decoration-color: rgba(120, 170, 255, 0.36);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease,
+    text-shadow 0.2s ease;
+}
+
+body .shell .card a:not(.cta):hover,
+body .shell .breadcrumb a:hover {
+  color: #a8c9ff;
+  text-decoration-color: rgba(168, 201, 255, 0.86);
+  text-shadow: 0 0 18px rgba(120, 170, 255, 0.13);
+}
+
+body .shell .footer-links a:hover {
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+/* A restrained entrance animation makes static editorial pages feel as alive as the calculator. */
+body .shell main > .breadcrumb,
+body .shell main > .eyebrow,
+body .shell main > h1,
+body .shell main > .lede,
+body .shell main > .meta-row,
+body .shell main > .cta-row,
+body .shell main > .snapshot-grid,
+body .shell main > .content-grid,
+body .shell main > .back {
+  animation: cb-content-rise 0.48s ease both;
+}
+
+body .shell main > .eyebrow { animation-delay: 0.03s; }
+body .shell main > h1 { animation-delay: 0.06s; }
+body .shell main > .lede { animation-delay: 0.09s; }
+body .shell main > .meta-row { animation-delay: 0.12s; }
+body .shell main > .cta-row { animation-delay: 0.15s; }
+body .shell main > .snapshot-grid { animation-delay: 0.17s; }
+body .shell main > .content-grid { animation-delay: 0.19s; }
+body .shell main > .back { animation-delay: 0.21s; }
+
+@keyframes cb-content-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body .shell *,
+  body .shell *::before,
+  body .shell *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  body .shell .brand:hover,
+  body .shell .nav a:hover,
+  body .shell .meta-chip:hover,
+  body .shell .card:hover,
+  body .shell .snapshot-card:hover,
+  body .shell .spec:hover,
+  body .shell .pairing:hover,
+  body .shell .cta:hover,
+  body .shell .back:hover,
+  body .shell .footer-links a:hover {
+    transform: none;
+  }
+}
