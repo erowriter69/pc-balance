@@ -13,6 +13,7 @@ export const SITE = {
 
 export const SITE_PAGES = [
   "/",
+  "/guides/",
   "/cpu-vs-gpu-bottleneck/",
   "/bottleneck-and-resolution/",
   "/is-10-percent-bottleneck-bad/",
@@ -30,6 +31,7 @@ export const SITE_PAGES = [
 
 export const SITE_PAGE_LASTMOD = {
   "/": "2026-08-29",
+  "/guides/": "2026-08-29",
   "/cpu-vs-gpu-bottleneck/": "2026-08-22",
   "/bottleneck-and-resolution/": "2026-08-15",
   "/is-10-percent-bottleneck-bad/": "2026-08-15",

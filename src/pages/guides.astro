@@ -1,0 +1,465 @@
+---
+import "../styles/content-page-effects.css";
+import cpus from "../data/cpus.json";
+import gpus from "../data/gpus.json";
+import { SITE, absoluteUrl } from "../site-config";
+
+const title = "PC Bottleneck Guides & Hardware Research | CalcBottleneck";
+const description = "Explore CalcBottleneck's CPU and GPU bottleneck guides, RTX pairing pages, resolution explainers, methodology, and original PC hardware balance research.";
+const canonicalUrl = absoluteUrl("/guides/");
+const modified = "2026-08-29";
+
+const gpuGuides = [
+  {
+    badge: "RTX 5060",
+    title: "RTX 5060 Bottleneck & CPU Pairing Guide",
+    description: "See how CPU choice, target FPS and resolution affect RTX 5060 balance, with practical pairing examples.",
+    href: "/rtx-5060-bottleneck/",
+  },
+  {
+    badge: "RTX 5060 Ti",
+    title: "RTX 5060 Ti 8GB & 16GB Pairing Guide",
+    description: "Compare CPU-side limits and the separate role of VRAM pressure across both RTX 5060 Ti memory variants.",
+    href: "/rtx-5060-ti-bottleneck/",
+  },
+  {
+    badge: "RTX 5070",
+    title: "RTX 5070 Bottleneck & CPU Pairing Guide",
+    description: "Understand where an RTX 5070 pairing can become CPU-limited and when higher resolution shifts pressure back to the GPU.",
+    href: "/rtx-5070-bottleneck/",
+  },
+  {
+    badge: "RTX 5070 Ti",
+    title: "RTX 5070 Ti Bottleneck & CPU Pairing Guide",
+    description: "Review common CPU pairings, resolution behavior, and what upscaling or frame generation can change in the bottleneck picture.",
+    href: "/rtx-5070-ti-bottleneck/",
+  },
+];
+
+const learningGuides = [
+  {
+    label: "FOUNDATIONS",
+    title: "CPU Bottleneck vs GPU Bottleneck",
+    description: "Learn how to tell whether the processor or graphics card is the limiting side of a workload.",
+    href: "/cpu-vs-gpu-bottleneck/",
+  },
+  {
+    label: "RESOLUTION",
+    title: "How 1080p, 1440p and 4K Change Bottlenecks",
+    description: "See why raising resolution usually increases GPU pressure without magically removing every CPU limit.",
+    href: "/bottleneck-and-resolution/",
+  },
+  {
+    label: "INTERPRETATION",
+    title: "Is a 10% Bottleneck Bad?",
+    description: "Put bottleneck percentages in context instead of treating a single number as a pass-or-fail score.",
+    href: "/is-10-percent-bottleneck-bad/",
+  },
+  {
+    label: "TROUBLESHOOTING",
+    title: "How to Reduce a PC Bottleneck",
+    description: "Work through practical settings, workload and upgrade decisions when one component is consistently holding a build back.",
+    href: "/how-to-fix-pc-bottleneck/",
+  },
+];
+
+const itemList = [
+  ...learningGuides.map((item) => ({ name: item.title, url: absoluteUrl(item.href) })),
+  ...gpuGuides.map((item) => ({ name: item.title, url: absoluteUrl(item.href) })),
+  { name: "PC Hardware Balance Report 2026", url: absoluteUrl("/research/pc-hardware-balance-report-2026/") },
+  { name: "CalcBottleneck Methodology", url: absoluteUrl("/methodology/") },
+];
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": `${canonicalUrl}#page`,
+      url: canonicalUrl,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      dateModified: modified,
+      isPartOf: { "@type": "WebSite", name: SITE.name, url: absoluteUrl("/") },
+      mainEntity: { "@id": `${canonicalUrl}#guides` },
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+    },
+    {
+      "@type": "ItemList",
+      "@id": `${canonicalUrl}#guides`,
+      name: "CalcBottleneck Guides and Research",
+      itemListElement: itemList.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        url: item.url,
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "CalcBottleneck", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Guides & Research", item: canonicalUrl },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CalcBottleneck guides and PC hardware research" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>CalcBottleneck</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a class="active" href="/guides/" aria-current="page">Guides</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">CalcBottleneck</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">Guides &amp; Research</span>
+        </nav>
+
+        <span class="eyebrow">LEARN • COMPARE • VERIFY</span>
+        <h1>Guides &amp; Research</h1>
+        <p class="lede">
+          Start with the calculator, then go deeper. This hub collects CalcBottleneck's practical CPU/GPU explainers, RTX pairing guides, methodology, and original hardware-dataset research in one place.
+        </p>
+
+        <div class="meta-row" aria-label="Hub highlights">
+          <span class="meta-chip">8 practical guides</span>
+          <span class="meta-chip">4 RTX pairing pages</span>
+          <span class="meta-chip">Original dataset research</span>
+          <span class="meta-chip">Transparent methodology</span>
+        </div>
+
+        <div class="cta-row" aria-label="Primary actions">
+          <a class="cta" href="/#calculator">Run the calculator <span aria-hidden="true">→</span></a>
+          <a class="cta secondary" href="/methodology/">See how estimates are built</a>
+        </div>
+
+        <section class="featured-research card callout" aria-labelledby="research-title">
+          <div class="featured-copy">
+            <span class="section-kicker">FEATURED RESEARCH</span>
+            <h2 id="research-title">PC Hardware Balance Report 2026</h2>
+            <p>
+              A transparent snapshot of the CPU and GPU catalog behind CalcBottleneck, including brand coverage, VRAM distribution, resolution scaling and evidence-quality status. It reports what is actually in the dataset without pretending every possible pairing was physically benchmarked.
+            </p>
+            <a class="cta" href="/research/pc-hardware-balance-report-2026/">Read the 2026 report <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="featured-mark" aria-hidden="true">
+            <span>2026</span>
+            <strong>DATA</strong>
+            <small>Hardware balance snapshot</small>
+          </div>
+        </section>
+
+        <section class="hub-section" aria-labelledby="gpu-guides-title">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">GPU PAIRING GUIDES</span>
+              <h2 id="gpu-guides-title">RTX 50-series pairing guides</h2>
+            </div>
+            <p>Use these when you already know the GPU and want to judge the CPU side of the build.</p>
+          </div>
+
+          <div class="guide-grid gpu-grid">
+            {gpuGuides.map((guide) => (
+              <article class="guide-card card">
+                <span class="guide-badge">{guide.badge}</span>
+                <h3>{guide.title}</h3>
+                <p>{guide.description}</p>
+                <a class="card-link" href={guide.href}>Open pairing guide <span aria-hidden="true">→</span></a>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section class="hub-section" aria-labelledby="learning-title">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">BOTTLENECK BASICS</span>
+              <h2 id="learning-title">Understand what the percentage means</h2>
+            </div>
+            <p>These explainers focus on interpretation rather than chasing a single perfect number.</p>
+          </div>
+
+          <div class="guide-grid">
+            {learningGuides.map((guide) => (
+              <article class="guide-card card">
+                <span class="guide-label">{guide.label}</span>
+                <h3>{guide.title}</h3>
+                <p>{guide.description}</p>
+                <a class="card-link" href={guide.href}>Read guide <span aria-hidden="true">→</span></a>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section class="trust-grid" aria-label="Methodology and project information">
+          <article class="trust-card card callout">
+            <span class="section-kicker">METHODOLOGY</span>
+            <h2>How CalcBottleneck builds an estimate</h2>
+            <p>See the evidence hierarchy, workload assumptions, resolution handling, limitations and shopping disclosure behind the calculator.</p>
+            <a class="card-link" href="/methodology/">Review methodology <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="trust-card card">
+            <span class="section-kicker">ABOUT THE PROJECT</span>
+            <h2>What CalcBottleneck is — and is not</h2>
+            <p>Read the project's purpose, independence statement and the distinction between comparative estimates and measured benchmark results.</p>
+            <a class="card-link" href="/about/">About CalcBottleneck <span aria-hidden="true">→</span></a>
+          </article>
+        </section>
+
+        <section class="closing-card card">
+          <div>
+            <span class="section-kicker">READY TO CHECK A BUILD?</span>
+            <h2>Use the guides for context. Use your own parts for the decision.</h2>
+            <p>Select the exact CPU, GPU, resolution and workload you care about, then share the generated result with a friend or PC-building community.</p>
+          </div>
+          <a class="cta" href="/#calculator">Open the calculator <span aria-hidden="true">→</span></a>
+        </section>
+
+        <a class="back" href="/">← Back to CalcBottleneck</a>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-shell">
+          <div class="footer-primary">
+            <div class="footer-about">
+              <a class="brand footer-brand" href="/">
+                <span class="brand-icon">⚡</span>
+                <span>CalcBottleneck</span>
+              </a>
+              <h3>Build a better-balanced PC.</h3>
+              <p>
+                Use the calculator for a specific build, then use these guides and research pages
+                to understand the result before making an upgrade decision.
+              </p>
+              <div class="footer-stats" aria-label="CalcBottleneck catalog coverage">
+                <div><strong>{cpus.length}</strong><span>Processors</span></div>
+                <div><strong>{gpus.length}</strong><span>Graphics cards</span></div>
+                <div><strong>3</strong><span>Resolutions analysed</span></div>
+              </div>
+            </div>
+
+            <div class="footer-column">
+              <h4>Explore</h4>
+              <a href="/#calculator">Bottleneck Calculator</a>
+              <a href="/guides/">Guides &amp; Research</a>
+              <a href="/cpu-vs-gpu-bottleneck/">CPU vs GPU Bottlenecks</a>
+              <a href="/bottleneck-and-resolution/">Resolution Guide</a>
+              <a href="/how-to-fix-pc-bottleneck/">Fix a Bottleneck</a>
+            </div>
+
+            <div class="footer-column">
+              <h4>Research &amp; Trust</h4>
+              <a href="/research/pc-hardware-balance-report-2026/">2026 Hardware Balance Report</a>
+              <a href="/methodology/">Methodology &amp; Sources</a>
+              <a href="/about/">About CalcBottleneck</a>
+              <a href="/methodology/#shopping-disclosure">Shopping Disclosure</a>
+            </div>
+          </div>
+
+          <div class="footer-secondary">
+            <div class="footer-identity">
+              <strong>CalcBottleneck</strong>
+              <span>CPU &amp; GPU decision-support tools</span>
+            </div>
+            <p>
+              Estimates are comparative and can vary by game, application, settings, drivers,
+              cooling, memory configuration, and hardware.
+            </p>
+            <div class="footer-legal-links" aria-label="Legal links">
+              <a href="/about/">About</a>
+              <a href="/methodology/">Methodology</a>
+              <a href="/privacy/">Privacy</a>
+              <a href="/terms/">Terms</a>
+            </div>
+            <span class="copyright">© {new Date().getFullYear()} CalcBottleneck</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link { position:fixed; top:12px; left:12px; z-index:9999; padding:10px 14px; border-radius:10px; background:#fff; color:#07101f; font-weight:800; transform:translateY(-160%); transition:transform .18s ease; }
+  .skip-link:focus { transform:translateY(0); }
+  .shell { min-height:100vh; background:radial-gradient(circle at 50% 0%,rgba(37,99,235,.15),transparent 32%),linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom:1px solid rgba(255,255,255,.07); background:rgba(7,16,31,.9); }
+  .header-inner { width:min(1080px,92%); min-height:72px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover, .nav a.active { color:#fff; }
+  .nav a.active { text-shadow:0 0 18px rgba(120,170,255,.25); }
+  main { width:min(1080px,92%); margin:0 auto; padding:72px 0 90px; }
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+  .eyebrow, .section-kicker { color:#78aaff; font-size:.72rem; font-weight:850; letter-spacing:.15em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.7rem,7vw,4.8rem); line-height:1.02; letter-spacing:-.05em; }
+  .lede { max-width:850px; margin:0; color:#a8b7cb; font-size:1.08rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .cta-row { display:flex; flex-wrap:wrap; gap:12px; margin-top:22px; }
+  .cta { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:48px; padding:0 18px; border-radius:12px; text-decoration:none; font-weight:850; }
+  .cta.secondary { border:1px solid rgba(120,170,255,.28); background:rgba(37,99,235,.1); color:#9fc2ff; }
+
+  .featured-research { position:relative; overflow:hidden; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(220px,.6fr); gap:32px; align-items:center; margin-top:54px; padding:34px; border:1px solid rgba(120,170,255,.28); border-radius:24px; background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(9,23,42,.94)); box-shadow:0 28px 80px rgba(1,7,18,.18); }
+  .featured-research::before { content:""; position:absolute; width:360px; height:360px; right:-140px; top:-180px; border-radius:50%; background:rgba(69,130,255,.15); filter:blur(30px); pointer-events:none; }
+  .featured-copy { position:relative; z-index:1; }
+  .featured-copy h2 { margin:9px 0 10px; font-size:clamp(1.8rem,4vw,2.6rem); letter-spacing:-.035em; }
+  .featured-copy p { max-width:720px; margin:0 0 20px; color:#a7b8cc; }
+  .featured-mark { position:relative; z-index:1; min-height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid rgba(120,170,255,.22); border-radius:20px; background:rgba(5,16,33,.48); text-align:center; }
+  .featured-mark span { color:#6f9ce9; font-size:.78rem; font-weight:900; letter-spacing:.18em; }
+  .featured-mark strong { margin-top:2px; font-size:clamp(2.7rem,7vw,4.7rem); line-height:1; letter-spacing:-.06em; background:linear-gradient(135deg,#dceaff,#5798ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .featured-mark small { margin-top:10px; color:#8295ad; font-weight:700; }
+
+  .hub-section { margin-top:68px; }
+  .section-heading { display:flex; justify-content:space-between; gap:28px; align-items:end; margin-bottom:20px; }
+  .section-heading h2 { margin:7px 0 0; font-size:clamp(1.8rem,4vw,2.55rem); letter-spacing:-.035em; }
+  .section-heading > p { max-width:430px; margin:0; color:#899db7; text-align:right; }
+  .guide-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+  .guide-card { min-height:245px; padding:26px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); display:flex; flex-direction:column; }
+  .guide-badge, .guide-label { align-self:flex-start; display:inline-flex; padding:7px 10px; border:1px solid rgba(120,170,255,.2); border-radius:999px; background:rgba(37,99,235,.09); color:#83b0ff; font-size:.7rem; font-weight:850; letter-spacing:.08em; }
+  .guide-card h3 { margin:15px 0 8px; font-size:1.25rem; line-height:1.3; letter-spacing:-.022em; }
+  .guide-card p { margin:0; color:#94a7bf; }
+  .card-link { display:inline-flex; align-items:center; gap:8px; margin-top:auto; padding-top:20px; color:#78aaff; text-decoration:none; font-weight:800; }
+  .card-link span { transition:transform .2s ease; }
+  .card-link:hover span { transform:translateX(4px); }
+  .trust-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:68px; }
+  .trust-card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .trust-card.callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .trust-card h2 { margin:8px 0 8px; font-size:1.45rem; letter-spacing:-.025em; }
+  .trust-card p { margin:0; color:#94a7bf; }
+  .closing-card { display:flex; align-items:center; justify-content:space-between; gap:28px; margin-top:18px; padding:30px; border:1px solid rgba(120,170,255,.22); border-radius:20px; background:rgba(8,22,42,.88); }
+  .closing-card h2 { margin:7px 0 8px; max-width:680px; font-size:1.55rem; letter-spacing:-.025em; }
+  .closing-card p { max-width:720px; margin:0; color:#94a7bf; }
+  .closing-card .cta { flex:0 0 auto; }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  .site-footer {
+    margin-top:72px;
+    border-top:1px solid rgba(105,155,232,.12);
+    background:radial-gradient(circle at 12% 0%,rgba(37,99,235,.07),transparent 30%),#050d19;
+  }
+  .footer-shell { width:min(1180px,92%); margin:0 auto; }
+  .footer-primary {
+    padding:52px 0 42px;
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) repeat(2,minmax(180px,.85fr));
+    gap:52px;
+  }
+  .footer-brand { display:inline-flex; width:max-content; }
+  .footer-about h3 { margin:20px 0 0; color:#eef4fb; font-size:1.15rem; }
+  .footer-about > p { max-width:440px; margin:11px 0 0; color:#8da0b7; font-size:.94rem; line-height:1.72; }
+  .footer-stats { margin-top:22px; display:flex; flex-wrap:wrap; gap:20px; }
+  .footer-stats > div { padding-right:20px; border-right:1px solid rgba(255,255,255,.07); }
+  .footer-stats > div:last-child { padding-right:0; border-right:0; }
+  .footer-stats strong,.footer-stats span { display:block; }
+  .footer-stats strong { color:#7eafff; font-size:1.08rem; }
+  .footer-stats span { margin-top:3px; color:#71859e; font-size:.75rem; }
+  .footer-column { display:flex; flex-direction:column; align-items:flex-start; gap:11px; }
+  .footer-column h4 { margin:0 0 6px; color:#e3ebf5; font-size:.94rem; }
+  .footer-column a,.footer-legal-links a { color:#8da0b7; text-decoration:none; transition:color .18s ease,transform .18s ease; }
+  .footer-column a { font-size:.86rem; line-height:1.45; }
+  .footer-column a:hover,.footer-legal-links a:hover { color:#8bb9ff; transform:translateX(2px); }
+  .footer-secondary {
+    min-height:96px;
+    padding:24px 0 28px;
+    display:grid;
+    grid-template-columns:1fr 1.55fr auto;
+    gap:26px;
+    align-items:center;
+    border-top:1px solid rgba(255,255,255,.07);
+  }
+  .footer-identity strong,.footer-identity span { display:block; }
+  .footer-identity strong { color:#d4dfed; font-size:.88rem; }
+  .footer-identity span { margin-top:3px; color:#6f849d; font-size:.75rem; }
+  .footer-secondary > p { margin:0; color:#71859e; text-align:center; font-size:.78rem; line-height:1.58; }
+  .footer-legal-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:13px; }
+  .footer-legal-links a { font-size:.8rem; }
+  .copyright { grid-column:1 / -1; color:#61758d; text-align:center; font-size:.75rem; }
+
+  @media (max-width:820px) {
+    .footer-primary { grid-template-columns:1fr 1fr; gap:34px; }
+    .footer-about { grid-column:1 / -1; }
+    .footer-secondary { grid-template-columns:1fr; text-align:center; }
+    .footer-secondary > p { max-width:620px; margin:0 auto; }
+    .footer-legal-links { justify-content:center; }
+    .featured-research { grid-template-columns:1fr; }
+    .featured-mark { min-height:150px; }
+    .section-heading { align-items:flex-start; flex-direction:column; gap:8px; }
+    .section-heading > p { text-align:left; }
+  }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .guide-grid, .trust-grid { grid-template-columns:1fr; }
+    .closing-card { align-items:flex-start; flex-direction:column; }
+    main { padding-top:52px; }
+  }
+  @media (max-width:480px) {
+    .footer-primary { grid-template-columns:1fr; padding:42px 0 34px; }
+    .footer-about { grid-column:auto; }
+    .footer-stats { gap:14px; }
+    .footer-stats > div { padding-right:14px; }
+    .featured-research { padding:24px 18px; }
+    .guide-card, .trust-card, .closing-card { padding:22px 18px; }
+  }
+</style>
