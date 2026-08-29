@@ -1,7 +1,7 @@
 ---
 import cpus from "../data/cpus.json";
 import gpus from "../data/gpus.json";
-import { SITE, absoluteUrl } from "../site-config";
+import { SITE, SITE_PAGE_LASTMOD, absoluteUrl } from "../site-config";
 
 const title = "CPU & GPU Bottleneck Calculator for PC Builds | CalcBottleneck";
 const description =
@@ -98,7 +98,7 @@ const structuredData = {
         { "@type": "Thing", name: "GPU bottleneck" },
         { "@type": "Thing", name: "PC hardware compatibility" },
       ],
-      dateModified: SITE.lastReviewed,
+      dateModified: SITE_PAGE_LASTMOD["/"],
       mainEntity: { "@id": `${canonicalUrl}#calculator` },
     },
     {
@@ -1337,6 +1337,7 @@ const popularGpus = sortedGpus.filter((gpu) => popularGpuIds.has(gpu.id));
 
             <div class="trust-actions">
               <a class="trust-primary" href="/methodology/">Read methodology</a>
+              <a href="/research/pc-hardware-balance-report-2026/">2026 hardware balance report</a>
               <a href="/about/">About CalcBottleneck</a>
               <a href="/methodology/#sources">View data sources</a>
             </div>

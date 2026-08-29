@@ -1,0 +1,419 @@
+---
+import cpus from "../../data/cpus.json";
+import gpus from "../../data/gpus.json";
+import { SITE, absoluteUrl } from "../../site-config";
+
+const published = "2026-08-29";
+const title = "PC Hardware Balance Report 2026: 30,690 CPU/GPU Pairings | CalcBottleneck";
+const description = `A transparent 2026 snapshot of CalcBottleneck's ${cpus.length} CPU and ${gpus.length} GPU catalog, including brand coverage, VRAM trends, resolution scaling and data-quality status.`;
+const canonicalUrl = absoluteUrl("/research/pc-hardware-balance-report-2026/");
+const pairings = cpus.length * gpus.length;
+
+const percent = (value: number, total: number) =>
+  total ? Math.round((value / total) * 1000) / 10 : 0;
+
+const countBy = <T extends Record<string, unknown>>(items: T[], key: keyof T) => {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    const label = String(item[key] ?? "Unknown");
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([name, count]) => ({ name, count, share: percent(count, items.length) }))
+    .sort((a, b) => b.count - a.count);
+};
+
+const cpuBrands = countBy(cpus, "brand");
+const gpuBrands = countBy(gpus, "brand");
+const cpuPairingStatus = countBy(cpus, "pairingIndexStatus");
+const gpuPairingStatus = countBy(gpus, "pairingIndexStatus");
+
+const modernGpus = gpus.filter((gpu) => gpu.releaseYear >= 2020);
+const recentGpus = gpus.filter((gpu) => gpu.releaseYear >= 2024);
+const modern12GbPlus = modernGpus.filter((gpu) => gpu.vramGB >= 12).length;
+const recent12GbPlus = recentGpus.filter((gpu) => gpu.vramGB >= 12).length;
+
+const median = (values: number[]) => {
+  const sorted = [...values].sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+};
+
+const ratio1440 = gpus
+  .filter((gpu) => gpu.rasterFps1080 > 0 && gpu.rasterFps1440 > 0)
+  .map((gpu) => (gpu.rasterFps1440 / gpu.rasterFps1080) * 100);
+const ratio4k = gpus
+  .filter((gpu) => gpu.rasterFps1080 > 0 && gpu.rasterFps4k > 0)
+  .map((gpu) => (gpu.rasterFps4k / gpu.rasterFps1080) * 100);
+
+const median1440Retention = Math.round(median(ratio1440) * 10) / 10;
+const median4kRetention = Math.round(median(ratio4k) * 10) / 10;
+
+const cpuYearMin = Math.min(...cpus.map((cpu) => cpu.releaseYear));
+const cpuYearMax = Math.max(...cpus.map((cpu) => cpu.releaseYear));
+const gpuYearMin = Math.min(...gpus.map((gpu) => gpu.releaseYear));
+const gpuYearMax = Math.max(...gpus.map((gpu) => gpu.releaseYear));
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": `${canonicalUrl}#article`,
+      url: canonicalUrl,
+      headline: title,
+      name: title,
+      description,
+      inLanguage: SITE.language,
+      datePublished: published,
+      dateModified: published,
+      author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      publisher: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      mainEntityOfPage: canonicalUrl,
+      about: { "@id": `${canonicalUrl}#dataset` },
+      breadcrumb: { "@id": `${canonicalUrl}#breadcrumb` },
+    },
+    {
+      "@type": "Dataset",
+      "@id": `${canonicalUrl}#dataset`,
+      name: "CalcBottleneck PC Hardware Balance Dataset Snapshot 2026",
+      description: `A catalog snapshot covering ${cpus.length} CPUs, ${gpus.length} GPUs and ${pairings.toLocaleString("en-US")} possible base CPU/GPU pairings before workload and resolution context is applied.`,
+      creator: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+      dateModified: published,
+      temporalCoverage: `${Math.min(cpuYearMin, gpuYearMin)}/${Math.max(cpuYearMax, gpuYearMax)}`,
+      isAccessibleForFree: true,
+      license: absoluteUrl("/terms/"),
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "CalcBottleneck", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Research", item: canonicalUrl },
+        { "@type": "ListItem", position: 3, name: "PC Hardware Balance Report 2026", item: canonicalUrl },
+      ],
+    },
+  ],
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteUrl("/og-image.png")} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CalcBottleneck PC Hardware Balance Report 2026" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl("/og-image.png")} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="shell">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand" href="/"><span class="brand-icon">⚡</span><span>CalcBottleneck</span></a>
+          <nav class="nav" aria-label="Primary navigation">
+            <a href="/#calculator">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+          </nav>
+        </div>
+      </header>
+
+      <main id="main-content">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">CalcBottleneck</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">PC Hardware Balance Report 2026</span>
+        </nav>
+
+        <span class="eyebrow">CALCBOTTLENECK RESEARCH</span>
+        <h1>PC Hardware Balance Report 2026</h1>
+        <p class="lede">
+          A transparent snapshot of the hardware catalog behind CalcBottleneck. This report describes what is actually in the dataset, how its coverage is distributed, and why resolution and evidence quality are modeled explicitly instead of reducing every PC to one universal percentage.
+        </p>
+        <div class="meta-row">
+          <span class="meta-chip">Published August 29, 2026</span>
+          <span class="meta-chip">Dataset snapshot</span>
+          <span class="meta-chip">No synthetic benchmark claims</span>
+          <span class="meta-chip">Methodology-linked</span>
+        </div>
+
+        <section class="snapshot-grid" aria-label="Dataset snapshot">
+          <article class="snapshot-card">
+            <span>PROCESSORS</span>
+            <strong>{cpus.length}</strong>
+            <p>AMD and Intel CPU entries</p>
+          </article>
+          <article class="snapshot-card">
+            <span>GRAPHICS CARDS</span>
+            <strong>{gpus.length}</strong>
+            <p>AMD, NVIDIA and Intel GPU entries</p>
+          </article>
+          <article class="snapshot-card featured">
+            <span>BASE CPU/GPU PAIRINGS</span>
+            <strong>{pairings.toLocaleString("en-US")}</strong>
+            <p>Possible catalog combinations before resolution, workload and FPS context</p>
+          </article>
+          <article class="snapshot-card">
+            <span>GPU RESOLUTION PROFILES</span>
+            <strong>3</strong>
+            <p>1080p, 1440p and 4K reference fields per GPU</p>
+          </article>
+        </section>
+
+        <div class="content-grid">
+          <section class="card callout">
+            <h2>What this report is—and what it is not</h2>
+            <p>
+              This is a <strong>dataset audit</strong>, not a claim that CalcBottleneck physically benchmarked every possible build. The calculator combines benchmark-informed reference fields, calibrated pairing indexes, workload context and confidence signals. This page summarizes the composition of that model so readers can inspect its scope before trusting an estimate.
+            </p>
+            <p>
+              For the calculation rules, evidence hierarchy and limitations, read the <a href="/methodology/">full methodology and source policy</a>.
+            </p>
+          </section>
+
+          <div class="two-col">
+            <section class="card">
+              <h2>CPU brand coverage</h2>
+              <div class="data-table" role="table" aria-label="CPU brand coverage">
+                {cpuBrands.map((row) => (
+                  <div class="data-row" role="row">
+                    <span role="cell">{row.name}</span>
+                    <strong role="cell">{row.count}</strong>
+                    <em role="cell">{row.share}%</em>
+                  </div>
+                ))}
+              </div>
+              <p class="small-note">CPU entries span model years {cpuYearMin}–{cpuYearMax}. This is catalog coverage, not market share.</p>
+            </section>
+
+            <section class="card">
+              <h2>GPU brand coverage</h2>
+              <div class="data-table" role="table" aria-label="GPU brand coverage">
+                {gpuBrands.map((row) => (
+                  <div class="data-row" role="row">
+                    <span role="cell">{row.name}</span>
+                    <strong role="cell">{row.count}</strong>
+                    <em role="cell">{row.share}%</em>
+                  </div>
+                ))}
+              </div>
+              <p class="small-note">GPU entries span model years {gpuYearMin}–{gpuYearMax}. This is catalog coverage, not market share.</p>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2>VRAM is becoming more important in the newer part of the catalog</h2>
+            <p>
+              Of the <strong>{modernGpus.length}</strong> GPUs in the current catalog released from 2020 onward, <strong>{modern12GbPlus}</strong> ({percent(modern12GbPlus, modernGpus.length)}%) carry at least 12 GB of graphics memory. Among the <strong>{recentGpus.length}</strong> entries released from 2024 onward, <strong>{recent12GbPlus}</strong> ({percent(recent12GbPlus, recentGpus.length)}%) have at least 12 GB.
+            </p>
+            <p>
+              That does not mean every workload needs 12 GB or more. It does mean a CPU/GPU balance tool should avoid treating VRAM pressure as if it were automatically a CPU bottleneck. The RTX 5060 Ti guide, for example, separates the 8 GB and 16 GB memory variants for this reason.
+            </p>
+            <p class="notice">These percentages describe the GPUs currently represented in CalcBottleneck's catalog. They are not sales, installed-base or market-share statistics.</p>
+          </section>
+
+          <section class="card">
+            <h2>Resolution changes the graphics workload materially</h2>
+            <div class="metric-pair">
+              <div>
+                <span>MEDIAN 1440P REFERENCE</span>
+                <strong>{median1440Retention}%</strong>
+                <p>of the same GPU's 1080p raster reference</p>
+              </div>
+              <div>
+                <span>MEDIAN 4K REFERENCE</span>
+                <strong>{median4kRetention}%</strong>
+                <p>of the same GPU's 1080p raster reference</p>
+              </div>
+            </div>
+            <p>
+              All {gpus.length} GPU entries currently carry 1080p, 1440p and 4K raster-reference fields. Across those entries, the median 1440p reference is {median1440Retention}% of the 1080p value and the median 4K reference is {median4kRetention}%.
+            </p>
+            <p>
+              These ratios are <strong>not universal FPS multipliers</strong>. Games, presets, ray tracing, upscaling and CPU limits can behave very differently. Their purpose here is to demonstrate why CalcBottleneck does not assume a GPU has the same effective load at every resolution. Read the <a href="/bottleneck-and-resolution/">resolution guide</a> for the practical interpretation.
+            </p>
+          </section>
+
+          <div class="two-col">
+            <section class="card">
+              <h2>CPU evidence status</h2>
+              <div class="data-table" role="table" aria-label="CPU pairing data status">
+                {cpuPairingStatus.map((row) => (
+                  <div class="data-row" role="row">
+                    <span role="cell">{row.name}</span>
+                    <strong role="cell">{row.count}</strong>
+                    <em role="cell">{row.share}%</em>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section class="card">
+              <h2>GPU evidence status</h2>
+              <div class="data-table" role="table" aria-label="GPU pairing data status">
+                {gpuPairingStatus.map((row) => (
+                  <div class="data-row" role="row">
+                    <span role="cell">{row.name}</span>
+                    <strong role="cell">{row.count}</strong>
+                    <em role="cell">{row.share}%</em>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <section class="card">
+            <h2>Why CalcBottleneck exposes confidence instead of hiding uncertainty</h2>
+            <p>
+              Hardware generations are not measured with one perfectly uniform benchmark suite. Newer products may have direct current reference data while older parts may require family calibration or legacy bridging. The current catalog records those states rather than pretending every input has identical evidence quality.
+            </p>
+            <p>
+              That is why the calculator reports an <strong>estimate confidence</strong> separately from the estimated mismatch. A close-looking percentage with limited evidence should not be interpreted with the same certainty as a well-supported modern pairing.
+            </p>
+          </section>
+
+          <section class="card methodology-card">
+            <h2>Reproduce the headline numbers</h2>
+            <p>
+              The headline pairing count is deliberately simple: <strong>{cpus.length} CPUs × {gpus.length} GPUs = {pairings.toLocaleString("en-US")} base pairings</strong>. Resolution, workload, RAM and target-FPS selections then add context to a chosen pairing; they are not counted as separate hardware combinations here.
+            </p>
+            <p>
+              Brand counts, release-year ranges, VRAM counts, resolution-reference ratios and evidence-status totals on this page are calculated directly from the same JSON catalogs used by the live calculator at build time.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>Use the research instead of treating it as a verdict</h2>
+            <ul>
+              <li><a href="/#calculator">Run the CPU & GPU bottleneck calculator</a></li>
+              <li><a href="/cpu-vs-gpu-bottleneck/">Learn how to distinguish CPU and GPU limits</a></li>
+              <li><a href="/bottleneck-and-resolution/">See how 1080p, 1440p and 4K change the balance</a></li>
+              <li><a href="/methodology/">Review CalcBottleneck's methodology, sources and limitations</a></li>
+            </ul>
+          </section>
+        </div>
+
+        <a class="back" href="/#calculator">← Back to the bottleneck calculator</a>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <span>© {new Date().getFullYear()} CalcBottleneck</span>
+          <div class="footer-links">
+            <a href="/">Calculator</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/about/">About</a>
+            <a href="/privacy/">Privacy</a>
+            <a href="/terms/">Terms</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+  :global(html) { scroll-behavior: smooth; }
+  :global(body) {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #07101f;
+    color: #f5f7fb;
+    line-height: 1.65;
+  }
+  :global(a) { color: inherit; }
+  :global(:focus-visible) { outline: 3px solid #78aaff; outline-offset: 3px; }
+  .skip-link { position:fixed; top:12px; left:12px; z-index:9999; padding:10px 14px; border-radius:10px; background:#fff; color:#07101f; font-weight:800; transform:translateY(-160%); transition:transform .18s ease; }
+  .skip-link:focus { transform:translateY(0); }
+  .shell { min-height:100vh; background:radial-gradient(circle at 50% 0%,rgba(37,99,235,.12),transparent 34%),linear-gradient(180deg,#07101f,#091322); }
+  .site-header { border-bottom:1px solid rgba(255,255,255,.07); background:rgba(7,16,31,.9); }
+  .header-inner { width:min(1080px,92%); min-height:72px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:850; }
+  .brand-icon { width:34px; height:34px; display:grid; place-items:center; border:1px solid rgba(93,162,255,.32); border-radius:10px; background:rgba(37,99,235,.16); color:#78aaff; }
+  .nav { display:flex; flex-wrap:wrap; gap:20px; }
+  .nav a { color:#9eadc2; text-decoration:none; font-size:.9rem; font-weight:650; }
+  .nav a:hover { color:#fff; }
+  main { width:min(960px,92%); margin:0 auto; padding:72px 0 90px; }
+  .breadcrumb { display:flex; align-items:center; gap:9px; margin:0 0 28px; color:#7f93ad; font-size:.84rem; }
+  .breadcrumb a { color:#78a9ff; text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+  .breadcrumb span[aria-current="page"] { color:#aebdd0; }
+  .eyebrow { color:#78aaff; font-size:.75rem; font-weight:850; letter-spacing:.16em; }
+  h1 { margin:10px 0 14px; font-size:clamp(2.3rem,6vw,4rem); line-height:1.05; letter-spacing:-.045em; }
+  .lede { max-width:820px; margin:0; color:#a8b7cb; font-size:1.05rem; line-height:1.8; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+  .meta-chip { padding:8px 11px; border:1px solid rgba(120,170,255,.18); border-radius:999px; background:rgba(37,99,235,.08); color:#91a8c5; font-size:.78rem; }
+  .snapshot-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:42px; }
+  .snapshot-card { padding:22px; border:1px solid rgba(255,255,255,.08); border-radius:18px; background:rgba(9,23,42,.86); }
+  .snapshot-card.featured { border-color:rgba(120,170,255,.3); background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(9,23,42,.94)); }
+  .snapshot-card span { display:block; color:#78aaff; font-size:.68rem; font-weight:850; letter-spacing:.12em; }
+  .snapshot-card strong { display:block; margin-top:8px; font-size:clamp(1.7rem,4vw,2.4rem); line-height:1; }
+  .snapshot-card p { margin:9px 0 0; color:#8fa2b9; font-size:.8rem; }
+  .content-grid { display:grid; gap:18px; margin-top:18px; }
+  .card { padding:28px; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:rgba(9,23,42,.86); }
+  .card h2 { margin:0 0 12px; font-size:1.45rem; letter-spacing:-.025em; }
+  .card p { margin:10px 0 0; color:#9eadc2; }
+  .card ul { margin:12px 0 0; padding-left:22px; color:#9eadc2; }
+  .card li + li { margin-top:8px; }
+  .card a { color:#78aaff; font-weight:700; }
+  .callout { border-color:rgba(120,170,255,.28); background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(9,23,42,.92)); }
+  .two-col { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  .data-table { margin-top:16px; overflow:hidden; border:1px solid rgba(255,255,255,.07); border-radius:14px; }
+  .data-row { display:grid; grid-template-columns:1fr auto auto; gap:16px; align-items:center; padding:12px 14px; color:#aab9cb; }
+  .data-row + .data-row { border-top:1px solid rgba(255,255,255,.06); }
+  .data-row strong { color:#f5f7fb; }
+  .data-row em { min-width:54px; text-align:right; color:#78aaff; font-style:normal; font-weight:750; }
+  .small-note { font-size:.82rem; }
+  .notice { padding:15px 16px; border-left:3px solid #78aaff; border-radius:0 12px 12px 0; background:rgba(37,99,235,.09); color:#b7c6d8 !important; }
+  .metric-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:18px 0; }
+  .metric-pair > div { padding:20px; border:1px solid rgba(120,170,255,.16); border-radius:16px; background:rgba(37,99,235,.06); }
+  .metric-pair span { display:block; color:#8498b1; font-size:.7rem; font-weight:850; letter-spacing:.1em; }
+  .metric-pair strong { display:block; margin-top:7px; color:#78aaff; font-size:2rem; }
+  .metric-pair p { margin-top:5px; font-size:.82rem; }
+  .methodology-card { background:linear-gradient(135deg,rgba(20,50,92,.32),rgba(9,23,42,.9)); }
+  .back { display:inline-flex; margin-top:28px; color:#78aaff; text-decoration:none; font-weight:750; }
+  footer { border-top:1px solid rgba(255,255,255,.07); }
+  .footer-inner { width:min(1080px,92%); margin:0 auto; padding:28px 0 34px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; color:#77899f; font-size:.82rem; }
+  .footer-links { display:flex; flex-wrap:wrap; gap:14px; }
+  .footer-links a { text-decoration:none; }
+  .footer-links a:hover { color:#fff; }
+  @media (max-width:820px) {
+    .snapshot-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  }
+  @media (max-width:720px) {
+    .header-inner { align-items:flex-start; flex-direction:column; padding:16px 0; }
+    .two-col, .metric-pair { grid-template-columns:1fr; }
+    main { padding-top:52px; }
+    .card { padding:22px 18px; }
+  }
+  @media (max-width:480px) {
+    .snapshot-grid { grid-template-columns:1fr; }
+  }
+</style>

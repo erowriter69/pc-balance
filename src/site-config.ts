@@ -17,6 +17,7 @@ export const SITE_PAGES = [
   "/bottleneck-and-resolution/",
   "/is-10-percent-bottleneck-bad/",
   "/how-to-fix-pc-bottleneck/",
+  "/research/pc-hardware-balance-report-2026/",
   "/rtx-5070-bottleneck/",
   "/rtx-5060-bottleneck/",
   "/rtx-5060-ti-bottleneck/",
@@ -28,11 +29,12 @@ export const SITE_PAGES = [
 ] as const;
 
 export const SITE_PAGE_LASTMOD = {
-  "/": "2026-08-15",
+  "/": "2026-08-29",
   "/cpu-vs-gpu-bottleneck/": "2026-08-22",
   "/bottleneck-and-resolution/": "2026-08-15",
   "/is-10-percent-bottleneck-bad/": "2026-08-15",
   "/how-to-fix-pc-bottleneck/": "2026-08-15",
+  "/research/pc-hardware-balance-report-2026/": "2026-08-29",
   "/rtx-5070-bottleneck/": "2026-08-22",
   "/rtx-5060-bottleneck/": "2026-08-22",
   "/rtx-5060-ti-bottleneck/": "2026-08-22",
